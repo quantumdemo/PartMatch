@@ -25,23 +25,29 @@ export class SellerService {
       .eq("user_id", sellerId)
       .maybeSingle();
 
-    const { data: products } = await supabase
-      .from("products")
+    const { data: inventory } = await supabase
+      .from("inventory")
       .select("id, stock_quantity")
       .eq("seller_id", sellerId);
 
-    const inventoryCount = products?.length || 0;
-    const lowStockCount = products?.filter((p) => (p.stock_quantity || 0) < 3).length || 0;
+    const { data: orders } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("seller_id", sellerId);
+
+    const inventoryCount = inventory?.length || 0;
+    const lowStockCount = inventory?.filter((p) => (p.stock_quantity || 0) < 3).length || 0;
+    const totalEarnings = (orders || []).reduce((acc, o) => acc + (Number(o.total_amount) || 0), 0);
 
     return {
       seller_id: sellerId,
-      store_name: profile?.formatted_address ? `Store at ${profile.formatted_address}` : "Ladipo Auto Spares Merchant 12",
-      cac_number: "RC-1928301",
-      kyc_status: profile?.kyc_status || "APPROVED",
-      formatted_address: profile?.formatted_address || "Ladipo Spares Market, Mushin, Lagos",
-      total_earnings_ngn: 245000,
-      pending_escrow_ngn: 37000,
-      today_orders_count: 3,
+      store_name: profile?.store_name || profile?.company_name || profile?.full_name || "Merchant Store",
+      cac_number: profile?.cac_number || "RC-PENDING",
+      kyc_status: profile?.kyc_status || "PENDING",
+      formatted_address: profile?.formatted_address || "Lagos, Nigeria",
+      total_earnings_ngn: totalEarnings,
+      pending_escrow_ngn: 0,
+      today_orders_count: orders?.length || 0,
       inventory_count: inventoryCount,
       low_stock_alerts_count: lowStockCount,
     };

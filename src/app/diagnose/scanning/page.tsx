@@ -1,51 +1,99 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Eye, Sparkles } from "lucide-react";
+import React, { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Scan, Sparkles, Clock } from "lucide-react";
 
-export default function AIScanningPage() {
+function ScanningContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const vehicleId = searchParams?.get("vehicle_id") || "";
+  const method = searchParams?.get("method") || "camera";
+  const description = searchParams?.get("description") || "";
+
+  const [watTime, setWatTime] = useState<string>("");
 
   useEffect(() => {
+    const nowWAT = new Date().toLocaleTimeString("en-NG", {
+      timeZone: "Africa/Lagos",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }) + " WAT";
+    setWatTime(nowWAT);
+
+    async function runDiagnosis() {
+      try {
+        const res = await fetch("/api/diagnose", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description,
+            vehicle_id: vehicleId,
+            method,
+          }),
+        });
+
+        const data = await res.json();
+        const encodedData = encodeURIComponent(JSON.stringify(data));
+        router.push(`/diagnose/result?data=${encodedData}&vehicle_id=${vehicleId}`);
+      } catch {
+        router.push(`/diagnose/result?vehicle_id=${vehicleId}`);
+      }
+    }
+
     const timer = setTimeout(() => {
-      router.push("/diagnose/result");
-    }, 2200);
+      runDiagnosis();
+    }, 1500);
+
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [description, method, router, vehicleId]);
 
   return (
-    <main className="max-w-[440px] mx-auto px-4 bg-slate-900 text-white min-h-screen flex flex-col justify-between py-8 font-sans">
-      <div className="space-y-2 text-center pt-4">
-        <div className="inline-flex items-center gap-1.5 bg-[#FF4D1A]/20 text-[#FF4D1A] px-3 py-1 rounded-full text-xs font-bold">
-          <Sparkles className="w-3.5 h-3.5" /> AI Vision Engine
+    <main className="max-w-[440px] mx-auto px-4 bg-[#121212] min-h-screen font-sans flex flex-col justify-between py-8 text-white">
+      <div className="space-y-4 text-center pt-8">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#FF4D1A] bg-[#FF4D1A]/10 py-1 px-3 rounded-full w-fit mx-auto border border-[#FF4D1A]/20">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>PartMatch Vision AI Active</span>
         </div>
-        <h1 className="text-xl font-extrabold">Analyzing Vehicle Part...</h1>
-        <p className="text-xs text-slate-400">Comparing OEM numbers & visual vectors</p>
+        <h1 className="text-xl font-extrabold tracking-tight">AI is identifying part...</h1>
+        <p className="text-xs text-[#8A8A8A] flex items-center justify-center gap-1">
+          <Clock className="w-3.5 h-3.5 text-[#FF4D1A]" /> Timestamp: {watTime}
+        </p>
       </div>
 
-      {/* Camera View Finder Box */}
-      <div className="relative w-full h-80 bg-slate-800 border-2 border-dashed border-[#FF4D1A] rounded-2xl overflow-hidden flex items-center justify-center my-auto shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FF4D1A]/10 via-transparent to-[#FF4D1A]/10 animate-pulse" />
-        <div className="relative z-10 text-center space-y-3">
-          <div className="w-16 h-16 bg-[#FF4D1A] text-white rounded-2xl flex items-center justify-center mx-auto animate-bounce shadow-lg">
-            <Eye className="w-8 h-8" />
-          </div>
-          <p className="text-xs text-slate-300 font-mono tracking-wide">
-            Identifying OEM Specs...
+      {/* Camera Viewport Simulation Skeleton */}
+      <div className="relative w-full aspect-square rounded-[24px] bg-neutral-900 border-2 border-[#FF4D1A]/40 overflow-hidden flex items-center justify-center my-6 shadow-2xl">
+        <div className="absolute inset-x-0 h-1 bg-[#FF4D1A] shadow-[0_0_15px_#FF4D1A] animate-pulse" style={{ top: "45%" }} />
+
+        <div className="text-center space-y-3 z-10 px-6">
+          <Scan className="w-16 h-16 text-[#FF4D1A] mx-auto animate-spin" />
+          <p className="text-xs font-mono text-neutral-300">
+            Analyzing visual features & OEM part database...
           </p>
         </div>
+
+        {/* Framing Corners */}
+        <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#FF4D1A]" />
+        <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#FF4D1A]" />
+        <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#FF4D1A]" />
+        <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#FF4D1A]" />
       </div>
 
-      {/* Loading Shimmer Bar */}
-      <div className="space-y-2 pb-6">
-        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-          <div className="bg-[#FF4D1A] h-full w-3/4 animate-pulse rounded-full" />
-        </div>
-        <p className="text-[11px] text-center text-slate-400 font-mono">
-          94% Confidence vector match found
+      <div className="text-center space-y-2 pb-6">
+        <p className="text-xs font-semibold text-neutral-400">
+          Cross-checking against Nigerian marketplace inventories
         </p>
       </div>
     </main>
+  );
+}
+
+export default function ScanningPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-xs text-white">Scanning...</div>}>
+      <ScanningContent />
+    </Suspense>
   );
 }
