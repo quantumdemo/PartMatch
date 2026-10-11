@@ -4,40 +4,54 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingBag, ShieldCheck, ChevronRight, Trash2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
+import { createClient } from "@/lib/supabase/client";
 
 interface CartItem {
   id: string;
-  title: string;
-  price: number;
-  seller_name: string;
+  inventory_id: string;
+  part_name: string;
+  price_ngn: number;
   quantity: number;
 }
 
 export default function CartPage() {
   const router = useRouter();
+  const supabase = createClient();
+
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Read cart items from local state or empty array
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("partmatch_cart");
-      if (stored) {
-        setCartItems(JSON.parse(stored));
+    async function loadCart() {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      if (userId) {
+        const { data } = await supabase
+          .from("cart_items")
+          .select("*")
+          .eq("user_id", userId);
+
+        setCartItems(data || []);
+      } else {
+        setCartItems([]);
       }
+      setLoading(false);
     }
-    setLoading(false);
+
+    loadCart();
   }, []);
 
-  const handleRemoveItem = (id: string) => {
-    const updated = cartItems.filter((i) => i.id !== id);
-    setCartItems(updated);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("partmatch_cart", JSON.stringify(updated));
+  const handleRemoveItem = async (id: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      await supabase.from("cart_items").delete().eq("id", id).eq("user_id", session.user.id);
+      setCartItems((prev) => prev.filter((item) => item.id !== id));
     }
   };
 
-  const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalAmount = cartItems.reduce((acc, item) => acc + (Number(item.price_ngn) || 0) * item.quantity, 0);
 
   return (
     <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-4 pb-28 font-sans space-y-4">
@@ -57,11 +71,11 @@ export default function CartPage() {
       {/* Loading Skeleton */}
       {loading ? (
         <div className="space-y-3">
-          <div className="h-24 bg-neutral-200 rounded-[16px] animate-pulse" />
-          <div className="h-24 bg-neutral-200 rounded-[16px] animate-pulse" />
+          <div className="h-24 bg-neutral-200/80 rounded-[16px] animate-pulse" />
+          <div className="h-24 bg-neutral-200/80 rounded-[16px] animate-pulse" />
         </div>
       ) : cartItems.length === 0 ? (
-        /* Empty State UI from Prompt (Illustration + CTA) */
+        /* Empty State */
         <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-8 text-center space-y-4 shadow-sm my-6">
           <div className="w-16 h-16 bg-[#FFFBF5] border border-[#EAEAEA] rounded-full flex items-center justify-center mx-auto text-[#FF4D1A]">
             <ShoppingBag className="w-8 h-8" />
@@ -73,8 +87,8 @@ export default function CartPage() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/diagnose/search")}
-            className="w-full h-12 bg-[#FF4D1A] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+            onClick={() => router.push("/marketplace")}
+            className="w-full h-12 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
           >
             <span>Browse Auto Parts Marketplace</span>
             <ChevronRight className="w-4 h-4" />
@@ -89,10 +103,9 @@ export default function CartPage() {
               className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 flex items-center justify-between shadow-sm"
             >
               <div className="space-y-1">
-                <p className="text-xs font-bold text-[#121212]">{item.title}</p>
-                <p className="text-[11px] text-[#8A8A8A]">Merchant: {item.seller_name}</p>
-                <p className="text-sm font-extrabold text-[#FF4D1A]">
-                  ₦{item.price.toLocaleString("en-NG")}
+                <p className="text-xs font-bold text-[#121212]">{item.part_name}</p>
+                <p className="text-xs font-extrabold text-[#FF4D1A]">
+                  ₦{Number(item.price_ngn || 0).toLocaleString("en-NG")} x {item.quantity}
                 </p>
               </div>
               <button
@@ -115,11 +128,11 @@ export default function CartPage() {
 
             <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-[12px] flex items-center gap-2 text-[11px] text-amber-900">
               <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
-              <span>Funds locked safely in 72h PartMatch Escrow until delivery.</span>
+              <span>Funds locked safely in PartMatch Escrow until delivery.</span>
             </div>
 
             <button
-              onClick={() => router.push(`/checkout/escrow?part_id=${cartItems[0]?.id}`)}
+              onClick={() => router.push(`/checkout?cart_total=${totalAmount}`)}
               className="w-full h-12 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm"
             >
               <span>Proceed to Escrow Checkout</span>

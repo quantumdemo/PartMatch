@@ -30,10 +30,10 @@ export class WalletService {
 
     if (error || !data) {
       return {
-        available_balance: 245000,
-        escrow_balance: 37000,
-        total_earned: 380000,
-        total_spent: 98000,
+        available_balance: 0,
+        escrow_balance: 0,
+        total_earned: 0,
+        total_spent: 0,
       };
     }
 
@@ -63,33 +63,16 @@ export class WalletService {
     const { data, error } = await query;
 
     if (error || !data) {
-      return [
-        {
-          id: "tx-1",
-          reference: "PM-REF-88910023",
-          category: "ESCROW_RELEASE",
-          amount: 18500,
-          type: "INFLOW",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "tx-2",
-          reference: "PM-REF-44210088",
-          category: "FUND_WALLET",
-          amount: 50000,
-          type: "INFLOW",
-          created_at: new Date().toISOString(),
-        },
-      ];
+      return [];
     }
 
     return data.map((item: Record<string, unknown>) => ({
       id: String(item.id),
-      reference: String(item.reference),
-      category: String(item.category),
-      amount: Number(item.amount),
+      reference: String(item.reference || item.id),
+      category: String(item.category || "Transaction"),
+      amount: Number(item.amount || 0),
       type: (item.type as WalletTransaction["type"]) || "INFLOW",
-      created_at: String(item.created_at),
+      created_at: String(item.created_at || new Date().toISOString()),
     }));
   }
 }

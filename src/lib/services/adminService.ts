@@ -22,13 +22,17 @@ export class AdminService {
   static async getPlatformMetrics(): Promise<AdminMetrics> {
     const supabase = createClient();
     const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
-    const { count: orderCount } = await supabase.from("escrow_holdings").select("*", { count: "exact", head: true });
+    const { count: orderCount } = await supabase.from("orders").select("*", { count: "exact", head: true });
+    const { data: escrows } = await supabase.from("escrow_transactions").select("amount").eq("status", "SECURED");
+
+    const totalHeld = (escrows || []).reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
+    const revenue = Math.round(totalHeld * 0.05);
 
     return {
-      total_users: userCount || 148,
-      total_orders: orderCount || 62,
-      total_escrow_held_ngn: 1450000,
-      platform_revenue_ngn: 125000,
+      total_users: userCount || 0,
+      total_orders: orderCount || 0,
+      total_escrow_held_ngn: totalHeld,
+      platform_revenue_ngn: revenue,
     };
   }
 
@@ -51,7 +55,7 @@ export class AdminService {
       user_id: String(item.user_id),
       role: String(item.role),
       formatted_address: String(item.formatted_address || "Lagos, Nigeria"),
-      kyc_status: String(item.kyc_status || "APPROVED"),
+      kyc_status: String(item.kyc_status || "PENDING"),
       created_at: String(item.created_at || new Date().toISOString()),
     }));
   }

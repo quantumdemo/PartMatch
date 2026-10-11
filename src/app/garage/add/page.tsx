@@ -3,50 +3,61 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, AlertCircle, Plus } from "lucide-react";
-import { InfoTooltip } from "@/components/InfoTooltip";
-import { VehicleService } from "@/lib/services/vehicleService";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AddVehiclePage() {
+  const router = useRouter();
+  const supabase = createClient();
+
   const [make, setMake] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [year, setYear] = useState<number>(2014);
   const [vin, setVin] = useState<string>("");
   const [plateNumber, setPlateNumber] = useState<string>("");
+  const [engineType, setEngineType] = useState<string>("");
 
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
-  const router = useRouter();
-  const userId = "123e4567-e89b-12d3-a456-426614174000";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
-    if (!make || !model || !year) {
-      setError("Vehicle Make, Model, and Year are mandatory.");
+    if (!make.trim() || !model.trim() || !year) {
+      setError("Vehicle Make, Model, and Year are required.");
       return;
     }
 
-    try {
-      setSaving(true);
-      setError(null);
+    setSaving(true);
 
-      await VehicleService.addVehicle(userId, {
-        make,
-        model,
-        year: Number(year),
-        vin,
-        plate_number: plateNumber,
-      });
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
 
-      setSuccess(true);
-      setTimeout(() => router.push("/garage"), 1200);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to add vehicle.";
-      setError(msg);
-    } finally {
+    if (!userId) {
+      setError("Please log in to add a vehicle.");
       setSaving(false);
+      return;
+    }
+
+    const { error: insertErr } = await supabase.from("vehicles").insert({
+      owner_id: userId,
+      make: make.trim(),
+      model: model.trim(),
+      year: Number(year),
+      vin: vin.trim() || null,
+      plate_number: plateNumber.trim().toUpperCase() || null,
+      engine_type: engineType.trim() || null,
+      created_at: new Date().toISOString(),
+    });
+
+    setSaving(false);
+
+    if (insertErr) {
+      setError(insertErr.message);
+    } else {
+      setSuccess(true);
+      setTimeout(() => router.push("/garage"), 800);
     }
   };
 
@@ -82,31 +93,31 @@ export default function AddVehiclePage() {
 
       <form onSubmit={handleSubmit} className="bg-white border border-[#EAEAEA] rounded-[16px] p-5 space-y-4 shadow-sm">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#121212]">Vehicle Make (Manufacturer)</label>
+          <label className="text-xs font-bold text-[#121212]">Vehicle Make (Manufacturer) *</label>
           <input
             type="text"
             value={make}
             onChange={(e) => setMake(e.target.value)}
             placeholder="e.g. Toyota, Honda, Mercedes-Benz"
             required
-            className="w-full px-3.5 py-2.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#121212]">Vehicle Model</label>
+          <label className="text-xs font-bold text-[#121212]">Vehicle Model *</label>
           <input
             type="text"
             value={model}
             onChange={(e) => setModel(e.target.value)}
             placeholder="e.g. Corolla, Camry, Accord, C300"
             required
-            className="w-full px-3.5 py-2.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#121212]">Production Year</label>
+          <label className="text-xs font-bold text-[#121212]">Production Year *</label>
           <input
             type="number"
             min={1990}
@@ -114,36 +125,45 @@ export default function AddVehiclePage() {
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
             required
-            className="w-full px-3.5 py-2.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#121212] flex items-center">
-            VIN (17-Digit Vehicle Identification) <InfoTooltip id="nin" />
-          </label>
+          <label className="text-xs font-bold text-[#121212]">Machine / Engine Type</label>
+          <input
+            type="text"
+            value={engineType}
+            onChange={(e) => setEngineType(e.target.value)}
+            placeholder="e.g. 1.8L 4-Cylinder, V6, 2.4L i-VTEC"
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-[#121212]">VIN (17-Digit Vehicle Identification)</label>
           <input
             type="text"
             maxLength={17}
             value={vin}
             onChange={(e) => setVin(e.target.value.toUpperCase())}
-            placeholder="Optional 17-digit VIN e.g. 4T1B11HK..."
-            className="w-full px-3.5 py-2.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] font-mono focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+            placeholder="e.g. 4T1B11HK..."
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] font-mono focus:outline-none focus:border-[#FF4D1A]"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#121212]">Nigerian License Plate Number (Optional)</label>
+          <label className="text-xs font-bold text-[#121212]">License Plate Number</label>
           <input
             type="text"
             value={plateNumber}
             onChange={(e) => setPlateNumber(e.target.value.toUpperCase())}
             placeholder="e.g. EKY-123AA"
-            className="w-full px-3.5 py-2.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] font-mono focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+            className="w-full h-11 px-3.5 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] font-mono focus:outline-none focus:border-[#FF4D1A]"
           />
         </div>
 
-        <div className="sticky bottom-4 pt-2">
+        <div className="pt-2">
           <button
             type="submit"
             disabled={saving}

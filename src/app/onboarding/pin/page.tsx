@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, ShieldCheck, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
-import { InfoTooltip } from "@/components/InfoTooltip";
+import { Lock, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import { PinService } from "@/lib/services/pinService";
 import { createClient } from "@/lib/supabase/client";
 
 export default function OnboardingPINPage() {
-  const [userId, setUserId] = useState<string>("123e4567-e89b-12d3-a456-426614174000");
+  const [userId, setUserId] = useState<string>("dev-user-id");
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState<string[]>(["", "", "", ""]);
   const [step, setStep] = useState<"enter" | "confirm">("enter");
@@ -93,17 +92,28 @@ export default function OnboardingPINPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FFFBF5] text-[#0F172A] p-6 md:p-12 font-sans flex items-center justify-center">
-      <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-        <header className="text-center space-y-1">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF4D1A] bg-[#FF4D1A]/10 px-3 py-1 rounded-full mb-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> Step 5 of 5: Payment Authorization PIN
+    <main className="min-h-screen bg-[#FFFBF5] text-[#121212] font-sans p-4 flex flex-col justify-between max-w-[440px] mx-auto">
+      <div className="space-y-6 pt-4 pb-24">
+        {/* Progress Header */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
           </div>
-          <h1 className="text-2xl font-extrabold text-[#0F172A]">Set Your 4-Digit Payment PIN</h1>
-          <p className="text-xs text-[#64748B]">
-            Required for all future payments and withdrawals <InfoTooltip id="payment_pin" />
+          <p className="text-xs font-medium text-[#8A8A8A]">Step 6/7: Transaction PIN</p>
+        </div>
+
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">Set Transaction PIN</h1>
+          <p className="text-xs text-[#8A8A8A]">
+            Set a secret 4-digit PIN for authorizing escrow payouts and withdrawals.
           </p>
-        </header>
+        </div>
 
         {error && (
           <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
@@ -113,25 +123,26 @@ export default function OnboardingPINPage() {
         )}
 
         {success ? (
-          <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-3 text-emerald-900">
+          <div className="p-6 bg-white border border-[#EAEAEA] rounded-[16px] text-center space-y-3 shadow-sm">
             <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-            <h3 className="text-lg font-extrabold">Payment PIN Created!</h3>
-            <p className="text-xs text-emerald-700">
-              Your secret PIN has been hashed with bcrypt and saved. You can now use PartMatch securely.
+            <h3 className="text-lg font-extrabold text-[#121212]">PIN Set Successfully!</h3>
+            <p className="text-xs text-[#8A8A8A]">
+              Your 4-digit PIN has been bcrypt hashed and stored securely.
             </p>
             <button
               type="button"
-              onClick={() => router.push("/")}
-              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+              onClick={() => router.push("/onboarding/bank")}
+              className="w-full h-12 bg-[#FF4D1A] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm"
             >
-              Complete Onboarding & Go to Home <ArrowRight className="w-4 h-4" />
+              <span>Continue to Bank Details</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <div className="space-y-6">
             {step === "enter" && (
               <div className="space-y-3 text-center">
-                <label className="text-xs font-bold text-[#0F172A]">Enter 4-Digit Secret PIN</label>
+                <label className="text-xs font-bold text-[#121212]">Enter 4-Digit Secret PIN</label>
                 <div className="flex justify-center gap-3">
                   {pin.map((digit, idx) => (
                     <input
@@ -141,7 +152,7 @@ export default function OnboardingPINPage() {
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleEnterDigit(idx, e.target.value)}
-                      className="w-12 h-14 text-center text-xl font-bold bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-[#FF4D1A] focus:bg-white focus:outline-none transition shadow-sm"
+                      className="w-12 h-14 text-center text-xl font-bold bg-white border border-[#EAEAEA] rounded-[12px] focus:border-[#FF4D1A] focus:outline-none shadow-sm"
                     />
                   ))}
                 </div>
@@ -150,8 +161,8 @@ export default function OnboardingPINPage() {
 
             {step === "confirm" && (
               <div className="space-y-4 text-center">
-                <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#64748B] flex items-center justify-between">
-                  <span>PIN entered: <strong>••••</strong></span>
+                <div className="p-2.5 bg-white border border-[#EAEAEA] rounded-[12px] text-xs text-[#8A8A8A] flex items-center justify-between">
+                  <span>PIN entered: <strong className="text-[#121212]">••••</strong></span>
                   <button
                     type="button"
                     onClick={() => {
@@ -165,7 +176,7 @@ export default function OnboardingPINPage() {
                   </button>
                 </div>
 
-                <label className="text-xs font-bold text-[#0F172A]">Re-enter 4-Digit PIN to Confirm</label>
+                <label className="text-xs font-bold text-[#121212]">Re-enter 4-Digit PIN to Confirm</label>
                 <div className="flex justify-center gap-3">
                   {confirmPin.map((digit, idx) => (
                     <input
@@ -175,7 +186,7 @@ export default function OnboardingPINPage() {
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleConfirmDigit(idx, e.target.value)}
-                      className="w-12 h-14 text-center text-xl font-bold bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-[#FF4D1A] focus:bg-white focus:outline-none transition shadow-sm"
+                      className="w-12 h-14 text-center text-xl font-bold bg-white border border-[#EAEAEA] rounded-[12px] focus:border-[#FF4D1A] focus:outline-none shadow-sm"
                     />
                   ))}
                 </div>
@@ -184,10 +195,10 @@ export default function OnboardingPINPage() {
                   type="button"
                   disabled={saving || confirmPin.some((d) => d === "")}
                   onClick={handleSavePin}
-                  className="w-full py-3.5 bg-[#FF4D1A] hover:bg-[#E03E0F] disabled:bg-slate-300 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] disabled:bg-[#EAEAEA] text-white text-xs font-bold rounded-[12px] transition flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Lock className="w-4 h-4" />
-                  {saving ? "Saving PIN..." : "Save Payment PIN & Complete"}
+                  {saving ? "Saving PIN..." : "Save PIN & Proceed"}
                 </button>
               </div>
             )}

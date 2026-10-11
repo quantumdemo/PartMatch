@@ -1,31 +1,87 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { CreditCard, Building2, ShieldCheck, Lock } from "lucide-react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CreditCard, Building2, ShieldCheck, Lock, ArrowLeft } from "lucide-react";
 import { PaymentPinModal } from "@/components/PaymentPinModal";
+import { createClient } from "@/lib/supabase/client";
 
-export default function PaymentMethodPage() {
+function PaymentMethodContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const amountStr = searchParams?.get("amount") || "18500";
+  const title = searchParams?.get("title") || "Ceramic Front Brake Pad Set";
+  const address = searchParams?.get("address") || "";
+  const supabase = createClient();
+
+  const amount = Number(amountStr) || 18500;
   const [method, setMethod] = useState<"card" | "bank">("card");
   const [showPinModal, setShowPinModal] = useState<boolean>(false);
-  const router = useRouter();
+  const [userId, setUserId] = useState<string>("dev-user-id");
 
-  const userId = "123e4567-e89b-12d3-a456-426614174000";
+  useEffect(() => {
+    async function loadUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setUserId(session.user.id);
+      }
+    }
+    loadUser();
+  }, []);
 
   const handlePayClick = () => {
     setShowPinModal(true);
   };
 
-  const handlePinVerified = () => {
-    router.push("/orders/placed");
+  const handlePinVerified = async () => {
+    const orderRef = "PM-ESCROW-" + Math.floor(100000 + Math.random() * 900000);
+
+    const { data: orderData } = await supabase.from("orders").insert({
+      buyer_id: userId,
+      order_ref: orderRef,
+      part_title: title,
+      total_amount: amount,
+      delivery_address: address,
+      status: "SECURED_IN_ESCROW",
+      created_at: new Date().toISOString(),
+    }).select().maybeSingle();
+
+    const orderId = orderData?.id || "order-created";
+
+    await supabase.from("escrow_transactions").insert({
+      order_id: orderId,
+      buyer_id: userId,
+      amount: amount,
+      status: "SECURED",
+      created_at: new Date().toISOString(),
+    });
+
+    router.push(`/orders/${orderId}?secured=true`);
   };
 
   return (
-    <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-6 pb-24 font-sans space-y-6">
-      <header className="border-b border-[#EAEAEA] pb-4">
-        <h1 className="text-2xl font-bold text-[#121212]">Select Payment Method</h1>
-        <p className="text-xs text-[#8A8A8A]">Choose payment channel via Paystack NGN gateway</p>
+    <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-6 pb-28 font-sans space-y-5">
+      <header className="flex items-center gap-3 border-b border-[#EAEAEA] pb-4">
+        <button
+          onClick={() => router.back()}
+          className="p-2 rounded-xl bg-white border border-[#EAEAEA] text-[#121212]"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div>
+          <h1 className="text-xl font-bold text-[#121212]">Select Payment Channel</h1>
+          <p className="text-xs text-[#8A8A8A]">Paystack Protected NGN Payment</p>
+        </div>
       </header>
+
+      {/* Amount Display */}
+      <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-5 text-center space-y-1 shadow-sm">
+        <span className="text-[10px] uppercase font-bold text-[#8A8A8A]">Escrow Total Amount</span>
+        <p className="text-[36px] font-extrabold text-[#121212] leading-none tracking-tight">
+          ₦{amount.toLocaleString("en-NG")}
+        </p>
+        <p className="text-xs text-[#8A8A8A]">{title}</p>
+      </div>
 
       {/* Payment Options */}
       <div className="space-y-3">
@@ -40,8 +96,8 @@ export default function PaymentMethodPage() {
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-[#121212]">Debit / Credit Card</h3>
-              <p className="text-xs text-[#8A8A8A]">Mastercard, Visa, Verve</p>
+              <h3 className="font-bold text-sm text-[#121212]">Paystack Debit / Credit Card</h3>
+              <p className="text-xs text-[#8A8A8A]">Mastercard, Visa, Verve NGN</p>
             </div>
           </div>
           <input type="radio" checked={method === "card"} readOnly className="accent-[#FF4D1A]" />
@@ -59,7 +115,7 @@ export default function PaymentMethodPage() {
             </div>
             <div>
               <h3 className="font-bold text-sm text-[#121212]">Instant Bank Transfer</h3>
-              <p className="text-xs text-[#8A8A8A]">GTB, Access, Kuda, OPay NUBAN</p>
+              <p className="text-xs text-[#8A8A8A]">GTB, Access, OPay, Moniepoint NUBAN</p>
             </div>
           </div>
           <input type="radio" checked={method === "bank"} readOnly className="accent-[#FF4D1A]" />
@@ -68,10 +124,10 @@ export default function PaymentMethodPage() {
 
       <div className="p-4 bg-white border border-[#EAEAEA] rounded-[16px] text-xs text-[#8A8A8A] space-y-1">
         <div className="font-bold text-[#121212] flex items-center gap-1">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" /> Security PIN Verification Required
+          <ShieldCheck className="w-4 h-4 text-emerald-600" /> Transaction PIN Verification
         </div>
         <p className="text-[11px]">
-          Enter your 4-digit bcrypt payment PIN to authorize escrow lock.
+          Enter your 4-digit PIN to authorize securing funds in Escrow.
         </p>
       </div>
 
@@ -80,18 +136,25 @@ export default function PaymentMethodPage() {
         onClick={handlePayClick}
         className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white font-bold text-xs rounded-[12px] shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
       >
-        <Lock className="w-4 h-4" /> Authorize & Pay ₦18,500 NGN
+        <Lock className="w-4 h-4" /> Authorize & Pay ₦{amount.toLocaleString("en-NG")} NGN
       </button>
 
-      {/* PIN Authorization Modal */}
       <PaymentPinModal
         userId={userId}
         isOpen={showPinModal}
         onClose={() => setShowPinModal(false)}
         onVerified={handlePinVerified}
-        title="Enter Payment PIN"
+        title="Enter Transaction PIN"
         description="Authorization required to lock NGN funds in escrow"
       />
     </main>
+  );
+}
+
+export default function PaymentMethodPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-xs text-[#8A8A8A]">Loading payment options...</div>}>
+      <PaymentMethodContent />
+    </Suspense>
   );
 }
