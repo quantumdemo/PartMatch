@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, ShieldCheck, Lock, LogOut, HelpCircle, Settings, ChevronRight, Phone, Mail, MapPin, Edit } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/client";
 
 interface ProfileData {
@@ -145,8 +146,13 @@ export default function CustomerProfilePage() {
           </div>
 
           {/* Account Settings List */}
-          <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-2 shadow-sm">
-            <p className="text-xs font-bold text-[#121212]">Security & Support</p>
+          <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-3 shadow-sm">
+            <p className="text-xs font-bold text-[#121212]">Security & Preferences</p>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#8A8A8A]">App Display Theme</label>
+              <ThemeToggle />
+            </div>
 
             <button
               onClick={() => router.push("/me/security/reset-pin")}

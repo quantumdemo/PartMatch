@@ -6,6 +6,7 @@ import { Store, ShieldCheck, Lock, LogOut, MapPin, Award, Settings, HelpCircle, 
 import { SellerService, SellerProfileMetrics } from "@/lib/services/sellerService";
 import { BottomNav } from "@/components/BottomNav";
 import { InfoTooltip } from "@/components/InfoTooltip";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SellerProfilePage() {
   const router = useRouter();
@@ -83,8 +84,13 @@ export default function SellerProfilePage() {
       </div>
 
       {/* Security & Support Center */}
-      <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-2 shadow-sm">
+      <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-3 shadow-sm">
         <p className="text-xs font-bold text-[#121212]">Merchant Account Settings</p>
+
+        <div className="space-y-1">
+          <label className="text-[11px] font-semibold text-[#8A8A8A]">App Display Theme</label>
+          <ThemeToggle />
+        </div>
 
         <button
           onClick={() => router.push("/onboarding/pin")}

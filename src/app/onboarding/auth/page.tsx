@@ -1,12 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, AlertCircle, Clock } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Mail, Lock, ArrowRight, AlertCircle, Clock, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function OnboardingAuthPage() {
+function OnboardingAuthForm() {
+  const searchParams = useSearchParams();
+  const [roleCode, setRoleCode] = useState<string>("R-01");
   const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam) {
+      setRoleCode(roleParam);
+    } else if (typeof window !== "undefined") {
+      const storedRole = localStorage.getItem("role_pending") || localStorage.getItem("partmatch_selected_role");
+      if (storedRole === "buyer_fleet") setRoleCode("R-02");
+      else if (storedRole === "seller") setRoleCode("R-03");
+      else if (storedRole === "mechanic") setRoleCode("R-04");
+      else setRoleCode("R-01");
+    }
+  }, [searchParams]);
   const [otpToken, setOtpToken] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -85,7 +100,11 @@ export default function OnboardingAuthPage() {
           <p className="text-xs font-medium text-[#8A8A8A]">Step 2/7: Account Security</p>
         </div>
 
-        <div>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FF4D1A]/10 border border-[#FF4D1A]/20 rounded-full">
+            <Shield className="w-3.5 h-3.5 text-[#FF4D1A]" />
+            <span className="text-xs font-bold text-[#FF4D1A]">Selected Role: {roleCode}</span>
+          </div>
           <h1 className="text-2xl font-bold tracking-tight text-[#121212]">Account Authentication</h1>
           <p className="text-xs text-[#8A8A8A]">
             Verify email address with 6-digit OTP code & create account password.
@@ -256,5 +275,13 @@ export default function OnboardingAuthPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function OnboardingAuthPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[#FFFBF5] flex items-center justify-center p-4"><div className="w-6 h-6 border-2 border-[#FF4D1A] border-t-transparent rounded-full animate-spin" /></div>}>
+      <OnboardingAuthForm />
+    </React.Suspense>
   );
 }
