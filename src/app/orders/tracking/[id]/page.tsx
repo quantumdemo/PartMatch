@@ -43,7 +43,7 @@ export default function OrderTrackingPage() {
         </button>
         <div>
           <h1 className="text-base font-bold text-[#121212]">Live Delivery Tracking</h1>
-          <p className="text-[11px] text-[#8A8A8A]">OPay-Style Real-time Courier Map</p>
+          <p className="text-[11px] text-[#8A8A8A]">Real-time Courier Map</p>
         </div>
       </header>
 

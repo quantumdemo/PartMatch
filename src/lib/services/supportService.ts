@@ -137,17 +137,7 @@ export class SupportService {
     const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
-      return [
-        {
-          id: "TCK-88120",
-          user_id: userId || "user-123",
-          category: "Escrow Payment",
-          order_ref: "PM-REF-11111111",
-          status: "OPEN",
-          last_message_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        },
-      ];
+      return [];
     }
 
     return data.map((t: Record<string, unknown>) => ({
@@ -179,7 +169,7 @@ export class SupportService {
           ticket_id: ticketId,
           sender_id: "system-bot",
           sender_role: "system",
-          message: "Welcome to PartMatch OPay Live Chat Support.",
+          message: "Welcome to PartMatch Live Chat Support.",
           read: true,
           created_at: new Date().toISOString(),
         },

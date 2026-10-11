@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Mail, Lock, ArrowRight, AlertCircle, Clock } from "lucide-react";
+import { Mail, Lock, ArrowRight, AlertCircle, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function OnboardingAuthPage() {
@@ -65,25 +65,35 @@ export default function OnboardingAuthPage() {
       return;
     }
 
-    // Proceed to live camera verification
-    router.push("/onboarding/live-verify");
+    router.push("/onboarding/profile");
   };
 
   return (
-    <main className="min-h-screen bg-[#FFFBF5] text-[#0F172A] p-6 md:p-12 font-sans flex items-center justify-center">
-      <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-        <header className="text-center space-y-1">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF4D1A] bg-[#FF4D1A]/10 px-3 py-1 rounded-full mb-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> Step 2 of 5: Identity Authentication
+    <main className="min-h-screen bg-[#FFFBF5] text-[#121212] font-sans p-4 flex flex-col justify-between max-w-[440px] mx-auto">
+      <div className="space-y-6 pt-4 pb-24">
+        {/* Top Progress Stepper Header */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
           </div>
-          <h1 className="text-2xl font-extrabold text-[#0F172A]">Account Security Verification</h1>
-          <p className="text-xs text-[#64748B]">
-            Email OTP verification with 10-minute WAT expiry & mandatory password creation.
+          <p className="text-xs font-medium text-[#8A8A8A]">Step 2/7: Account Security</p>
+        </div>
+
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">Account Authentication</h1>
+          <p className="text-xs text-[#8A8A8A]">
+            Verify email address with 6-digit OTP code & create account password.
           </p>
-        </header>
+        </div>
 
         {(localError || error) && (
-          <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{localError || error}</span>
           </div>
@@ -92,9 +102,9 @@ export default function OnboardingAuthPage() {
         {/* STEP A: Email Entry */}
         {step === "email" && (
           <form onSubmit={handleSendOTP} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#0F172A] flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5 text-[#FF4D1A]" /> Email Address
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#121212] flex items-center gap-1">
+                <Mail className="w-3.5 h-3.5 text-[#FF4D1A]" /> Email Address *
               </label>
               <input
                 type="email"
@@ -102,24 +112,25 @@ export default function OnboardingAuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="enter.your.email@domain.com"
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+                className="w-full h-11 px-3.5 bg-white border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2"
+              className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-[12px] transition shadow-sm flex items-center justify-center gap-2"
             >
-              {loading ? "Sending OTP..." : "Send 6-Digit Email OTP"} <ArrowRight className="w-4 h-4" />
+              <span>{loading ? "Sending OTP..." : "Send 6-Digit Email OTP"}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
 
             {/* Social Logins */}
             <div className="relative my-4 text-center">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
+                <div className="w-full border-t border-[#EAEAEA]"></div>
               </div>
-              <span className="relative bg-white px-3 text-[11px] text-[#64748B] uppercase font-semibold">
+              <span className="relative bg-[#FFFBF5] px-3 text-[11px] text-[#8A8A8A] uppercase font-semibold">
                 Or continue with
               </span>
             </div>
@@ -128,14 +139,14 @@ export default function OnboardingAuthPage() {
               <button
                 type="button"
                 onClick={() => signInWithGoogle()}
-                className="py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-semibold text-[#0F172A] flex items-center justify-center gap-1.5"
+                className="h-11 bg-white hover:bg-neutral-50 border border-[#EAEAEA] rounded-[12px] text-xs font-bold text-[#121212] flex items-center justify-center gap-1.5"
               >
                 Google OAuth
               </button>
               <button
                 type="button"
                 onClick={() => signInWithApple()}
-                className="py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-semibold text-[#0F172A] flex items-center justify-center gap-1.5"
+                className="h-11 bg-white hover:bg-neutral-50 border border-[#EAEAEA] rounded-[12px] text-xs font-bold text-[#121212] flex items-center justify-center gap-1.5"
               >
                 Apple ID
               </button>
@@ -146,8 +157,8 @@ export default function OnboardingAuthPage() {
         {/* STEP B: Enter OTP */}
         {step === "verify_otp" && (
           <form onSubmit={handleVerifyOTP} className="space-y-4">
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-[#64748B] flex items-center justify-between">
-              <span>Code sent to: <strong className="text-[#0F172A]">{email}</strong></span>
+            <div className="p-3 bg-white rounded-[12px] border border-[#EAEAEA] text-xs text-[#8A8A8A] flex items-center justify-between">
+              <span>Code sent to: <strong className="text-[#121212]">{email}</strong></span>
               <button
                 type="button"
                 onClick={() => setStep("email")}
@@ -157,8 +168,8 @@ export default function OnboardingAuthPage() {
               </button>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#0F172A]">Enter 6-Digit Email OTP</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#121212]">Enter 6-Digit Email OTP</label>
               <input
                 type="text"
                 maxLength={6}
@@ -166,12 +177,11 @@ export default function OnboardingAuthPage() {
                 onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, ""))}
                 placeholder="123456"
                 required
-                className="w-full text-center text-lg font-mono tracking-widest px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+                className="w-full text-center text-lg font-mono tracking-widest h-12 bg-white border border-[#EAEAEA] rounded-[12px] text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
               />
             </div>
 
-            {/* Countdown timer display */}
-            <div className="flex items-center justify-between text-xs text-[#64748B]">
+            <div className="flex items-center justify-between text-xs text-[#8A8A8A]">
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-[#FF4D1A]" />
                 {canResend ? "Resend ready" : `Resend in ${countdown}s`}
@@ -180,7 +190,7 @@ export default function OnboardingAuthPage() {
                 type="button"
                 disabled={!canResend || loading}
                 onClick={() => sendOTP(email)}
-                className="text-[#FF4D1A] disabled:text-slate-400 font-bold underline text-xs"
+                className="text-[#FF4D1A] disabled:text-[#8A8A8A] font-bold underline text-xs"
               >
                 Resend Code
               </button>
@@ -189,9 +199,10 @@ export default function OnboardingAuthPage() {
             <button
               type="submit"
               disabled={loading || otpToken.length !== 6}
-              className="w-full py-3 bg-[#FF4D1A] hover:bg-[#E03E0F] disabled:bg-slate-300 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2"
+              className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] disabled:bg-[#EAEAEA] disabled:text-[#8A8A8A] text-white text-xs font-bold rounded-[12px] transition shadow-sm flex items-center justify-center gap-2"
             >
-              {loading ? "Verifying OTP..." : "Verify Code & Proceed"} <ArrowRight className="w-4 h-4" />
+              <span>{loading ? "Verifying OTP..." : "Verify Code & Proceed"}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         )}
@@ -199,9 +210,9 @@ export default function OnboardingAuthPage() {
         {/* STEP C: Mandatory Set Password */}
         {step === "set_password" && (
           <form onSubmit={handleSetPassword} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#0F172A] flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5 text-[#FF4D1A]" /> Create Account Password
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#121212] flex items-center gap-1">
+                <Lock className="w-3.5 h-3.5 text-[#FF4D1A]" /> Create Account Password *
               </label>
               <input
                 type="password"
@@ -209,27 +220,28 @@ export default function OnboardingAuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimum 8 characters"
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+                className="w-full h-11 px-3.5 bg-white border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#0F172A]">Confirm Password</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#121212]">Confirm Password *</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter password"
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
+                className="w-full h-11 px-3.5 bg-white border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2"
+              className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-[12px] transition shadow-sm flex items-center justify-center gap-2"
             >
-              Save Password & Continue <ArrowRight className="w-4 h-4" />
+              <span>Save Password & Continue</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         )}
