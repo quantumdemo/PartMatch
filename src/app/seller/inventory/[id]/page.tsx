@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Save, Power, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Save, Power } from "lucide-react";
 
 export default function EditPartPage() {
   const params = useParams();

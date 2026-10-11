@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Search, ShieldCheck, CheckCircle2, XCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { Search, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { AdminService, AdminUserRecord } from "@/lib/services/adminService";
 import { formatWAT } from "@/lib/timezone";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Package, ShieldCheck, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { OrderService, OrderRecord } from "@/lib/services/orderService";
 import { formatWAT } from "@/lib/timezone";
 

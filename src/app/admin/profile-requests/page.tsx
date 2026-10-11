@@ -63,7 +63,7 @@ export default function AdminProfileRequestsPage() {
         <div className="p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] space-y-1">
           <p className="font-bold">Reason Provided:</p>
           <p className="text-[#8A8A8A] leading-relaxed">
-            "Changed primary phone SIM card for OTP verification access in Lagos."
+            &quot;Changed primary phone SIM card for OTP verification access in Lagos.&quot;
           </p>
         </div>
 

@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, MessageSquare, Send } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { SupportService } from "@/lib/services/supportService";
 
 function NewSupportChatContent() {

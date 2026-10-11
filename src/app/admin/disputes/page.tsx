@@ -45,7 +45,7 @@ export default function AdminDisputesPage() {
             Buyer Claims: <InfoTooltip id="kyc" />
           </p>
           <p className="text-[#8A8A8A] leading-relaxed">
-            "Brake pads delivered do not match the OEM specifications for Toyota Corolla 2012. Mechanic fitment failed."
+            &quot;Brake pads delivered do not match the OEM specifications for Toyota Corolla 2012. Mechanic fitment failed.&quot;
           </p>
         </div>
 

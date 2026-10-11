@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ShieldCheck, ChevronRight, AlertCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, ShieldCheck, ChevronRight, Sparkles } from "lucide-react";
 
 interface AiResultData {
   part_name: string;
