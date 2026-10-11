@@ -32,7 +32,7 @@
 - [x] Role Guard Middleware (`src/middleware.ts`) restricting buyer/driver routes (`/garage`, `/diagnose`, `/marketplace`, `/cart`, `/checkout`, `/orders`)
 - [x] Database seed script (`supabase/seed.sql`)
 
-## STAGE 4: Delivery, Mechanic App R-04 & BottomNav Audit (COMPLETED)
+## STAGE 4: Delivery & Mechanic App R-04 (COMPLETED)
 - [x] Customer Orders & Live Tracking (`OrderService`, `TrackingService`)
   - `/orders` Customer escrow orders list with 72h countdown status
   - `/orders/[id]` Order details with escrow progress bar & WAT timestamps
@@ -47,6 +47,18 @@
   - `/mechanic/job/complete/[id]` Completion & 15% mechanic fee payout release
   - `/mechanic/wallet` Mechanic OPay style wallet with 48px balance & withdrawal CTA
   - `/mechanic/me` Mechanic profile with trade cert, shop GPS, & locked KYC
+
+## STAGE 5: Seller App R-03 + Wallet + Profile Matrix (COMPLETED)
+- [x] Seller App R-03 (`SellerService`, `InventoryService`, `WalletService`, `UserService`)
+  - `/seller/onboarding` CAC & Store GPS location registration
+  - `/seller/dashboard` 48px earnings, order count, stock alert
+  - `/seller/inventory` Search, genuine/aftermarket filter, skeleton/empty/error states
+  - `/seller/inventory/add` AI auto-fill part specs & Zod validation
+  - `/seller/inventory/[id]` Edit listing & active/inactive toggle
+  - `/seller/orders` Buyer escrow protection badge & 72h status countdown
+  - `/seller/orders/[id]` Waybill confirmation & tracking input
+  - `/seller/wallet` 48px seller balance & bank payout withdrawal
+  - `/seller/me` Store profile with locked CAC badge & warehouse location
 - [x] Bottom Navigation Audit Verification Matrix:
 
 | Role | Nav Icon | Page Route | Status OK |
@@ -60,7 +72,11 @@
 | Mechanic (R-04) | Jobs | `/mechanic/jobs` | OK |
 | Mechanic (R-04) | Wallet | `/mechanic/wallet` | OK |
 | Mechanic (R-04) | Me | `/mechanic/me` | OK |
+| Seller (R-03) | Home | `/seller/dashboard` | OK |
+| Seller (R-03) | Orders | `/seller/orders` | OK |
+| Seller (R-03) | Inventory | `/seller/inventory` | OK |
+| Seller (R-03) | Wallet | `/seller/wallet` | OK |
+| Seller (R-03) | Me | `/seller/me` | OK |
 
 ## Upcoming Stages
-- STAGE 5: Admin Panel, Realtime Chat & Disputes
 - STAGE 6: Production Polish & Mobile Expo Preparation
