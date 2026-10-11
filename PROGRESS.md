@@ -30,10 +30,9 @@
   - 85% Seller / 15% Mechanic / 5% Platform split calculation
   - 72-hour escrow lock timer
 - [x] Role Guard Middleware (`src/middleware.ts`) restricting buyer/driver routes (`/garage`, `/diagnose`, `/marketplace`, `/cart`, `/checkout`, `/orders`)
-- [x] Fixed Bottom Navigation Bar (`BottomNav`) across main views
 - [x] Database seed script (`supabase/seed.sql`)
 
-## STAGE 4: Delivery & Mechanic App R-04 (COMPLETED)
+## STAGE 4: Delivery, Mechanic App R-04 & BottomNav Audit (COMPLETED)
 - [x] Customer Orders & Live Tracking (`OrderService`, `TrackingService`)
   - `/orders` Customer escrow orders list with 72h countdown status
   - `/orders/[id]` Order details with escrow progress bar & WAT timestamps
@@ -47,8 +46,20 @@
   - `/mechanic/job/active/[id]` Active job checklist & photo proof upload
   - `/mechanic/job/complete/[id]` Completion & 15% mechanic fee payout release
   - `/mechanic/wallet` Mechanic OPay style wallet with 48px balance & withdrawal CTA
-  - Mechanic Bottom Navigation (`Jobs | Wallet | Me`)
-- [x] Role Guard Middleware enforcing R-04 Mechanic access on `/mechanic/*`
+  - `/mechanic/me` Mechanic profile with trade cert, shop GPS, & locked KYC
+- [x] Bottom Navigation Audit Verification Matrix:
+
+| Role | Nav Icon | Page Route | Status OK |
+|---|---|---|---|
+| Customer (R-01/R-02) | Home | `/dashboard` | OK |
+| Customer (R-01/R-02) | Garage | `/garage` | OK |
+| Customer (R-01/R-02) | Orders | `/orders` | OK |
+| Customer (R-01/R-02) | Wallet | `/wallet` | OK |
+| Customer (R-01/R-02) | Me | `/me` | OK |
+| Mechanic (R-04) | Home | `/mechanic/dashboard` | OK |
+| Mechanic (R-04) | Jobs | `/mechanic/jobs` | OK |
+| Mechanic (R-04) | Wallet | `/mechanic/wallet` | OK |
+| Mechanic (R-04) | Me | `/mechanic/me` | OK |
 
 ## Upcoming Stages
 - STAGE 5: Admin Panel, Realtime Chat & Disputes
