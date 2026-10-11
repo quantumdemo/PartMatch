@@ -367,8 +367,6 @@ DROP POLICY IF EXISTS "Users can view own wallet or admins view all" ON public.w
 CREATE POLICY "Users can view own wallet or admins view all" ON public.wallets
     FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
 
--- Wallet modifications strictly handled via RPC SECURITY DEFINER functions
-
 
 -- 4.4 TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "Users can view own transactions or admins view all" ON public.transactions;
@@ -386,9 +384,9 @@ CREATE POLICY "Parties or admin can view escrow holdings" ON public.escrow_holdi
     );
 
 
--- 4.6 PAYMENT PINS POLICIES
-DROP POLICY IF EXISTS "Users can view own payment pin record" ON public.payment_pins;
-CREATE POLICY "Users can view own payment pin record" ON public.payment_pins
+-- 4.6 PAYMENT PINS POLICIES (EXCLUDE DIRECT SELECT OF pin_hash TO CLIENT)
+DROP POLICY IF EXISTS "Users can view own payment pin status" ON public.payment_pins;
+CREATE POLICY "Users can view own payment pin status" ON public.payment_pins
     FOR SELECT USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Users can insert own payment pin" ON public.payment_pins;
@@ -483,11 +481,10 @@ CREATE POLICY "Buyer, Seller, or Admin can update order" ON public.orders
 
 
 -- ==========================================
--- 5. RPC SECURITY DEFINER ATOMIC FUNCTIONS
+-- 5. RPC SECURITY DEFINER ATOMIC FUNCTIONS WITH AUTHORIZATION
 -- ==========================================
 
 -- Function: create_transaction
--- Helper to record immutable transaction log entry safely
 CREATE OR REPLACE FUNCTION public.create_transaction(
     p_user_id UUID,
     p_type transaction_type,
@@ -505,6 +502,11 @@ RETURNS public.transactions AS $$
 DECLARE
     v_transaction public.transactions;
 BEGIN
+    -- Authorization Check
+    IF auth.uid() IS NOT NULL AND auth.uid() <> p_user_id AND NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Unauthorized: Cannot create transaction for another user.';
+    END IF;
+
     INSERT INTO public.transactions (
         user_id,
         type,
@@ -538,7 +540,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 -- Function: credit_wallet
--- Atomically credits user wallet available_balance and writes transaction record
 CREATE OR REPLACE FUNCTION public.credit_wallet(
     p_user_id UUID,
     p_amount NUMERIC,
@@ -554,6 +555,11 @@ DECLARE
     v_balance_before NUMERIC;
     v_balance_after NUMERIC;
 BEGIN
+    -- Authorization Check
+    IF auth.uid() IS NOT NULL AND auth.uid() <> p_user_id AND NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Unauthorized: Cannot credit another user wallet.';
+    END IF;
+
     IF p_amount <= 0 THEN
         RAISE EXCEPTION 'Credit amount must be greater than zero.';
     END IF;
@@ -565,7 +571,6 @@ BEGIN
     FOR UPDATE;
 
     IF NOT FOUND THEN
-        -- Auto-initialize wallet if absent
         INSERT INTO public.wallets (user_id, available_balance, escrow_balance, total_earned, total_spent)
         VALUES (p_user_id, 0.00, 0.00, 0.00, 0.00)
         RETURNING * INTO v_wallet;
@@ -574,7 +579,6 @@ BEGIN
     v_balance_before := v_wallet.available_balance;
     v_balance_after := v_balance_before + p_amount;
 
-    -- Update balance and total earned
     UPDATE public.wallets
     SET
         available_balance = v_balance_after,
@@ -587,7 +591,6 @@ BEGIN
     WHERE user_id = p_user_id
     RETURNING * INTO v_wallet;
 
-    -- Create immutable ledger entry
     PERFORM public.create_transaction(
         p_user_id,
         'INFLOW',
@@ -608,7 +611,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 -- Function: debit_wallet
--- Atomically debits user wallet available_balance (with race condition & overdraft protection)
 CREATE OR REPLACE FUNCTION public.debit_wallet(
     p_user_id UUID,
     p_amount NUMERIC,
@@ -625,11 +627,15 @@ DECLARE
     v_balance_before NUMERIC;
     v_balance_after NUMERIC;
 BEGIN
+    -- Authorization Check
+    IF auth.uid() IS NOT NULL AND auth.uid() <> p_user_id AND NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Unauthorized: Cannot debit another user wallet.';
+    END IF;
+
     IF p_amount <= 0 THEN
         RAISE EXCEPTION 'Debit amount must be greater than zero.';
     END IF;
 
-    -- Acquire row lock to prevent race double-withdraw or double-spend
     SELECT * INTO v_wallet
     FROM public.wallets
     WHERE user_id = p_user_id
@@ -655,7 +661,6 @@ BEGIN
     WHERE user_id = p_user_id
     RETURNING * INTO v_wallet;
 
-    -- Record transaction
     PERFORM public.create_transaction(
         p_user_id,
         'OUTFLOW',
