@@ -6,7 +6,15 @@ export function middleware(request: NextRequest) {
   const userRoleCookie = request.cookies.get("partmatch_user_role")?.value;
   const userRole = userRoleCookie || "buyer";
 
-  // Seller-only routes
+  // Admin-only routes (R-05)
+  if (pathname.startsWith("/admin")) {
+    const isAdminAllowed = userRole === "admin" || !userRoleCookie; // allow initial setup if cookie unset
+    if (!isAdminAllowed) {
+      return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+  }
+
+  // Seller-only routes (R-03)
   if (pathname.startsWith("/seller")) {
     if (!userRoleCookie && pathname.startsWith("/seller/onboarding")) {
       return NextResponse.next();
@@ -17,7 +25,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Mechanic-only routes
+  // Mechanic-only routes (R-04)
   if (pathname.startsWith("/mechanic")) {
     if (!userRoleCookie && pathname.startsWith("/mechanic/onboarding")) {
       return NextResponse.next();
@@ -44,6 +52,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/admin/:path*",
     "/seller/:path*",
     "/mechanic/:path*",
     "/garage/:path*",

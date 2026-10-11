@@ -56,7 +56,7 @@ export default function MechanicOnboardingPage() {
         <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-5 space-y-4 shadow-sm">
           <div className="space-y-1">
             <h2 className="text-xs font-bold text-[#121212] flex items-center">
-              Workshop Location GPS <InfoTooltip id="address" />
+              Workshop Location GPS <InfoTooltip id="proof_address" />
             </h2>
             <p className="text-[11px] text-[#8A8A8A]">
               Pin your physical workshop or mobile service area in Lagos.
