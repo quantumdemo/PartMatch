@@ -31,9 +31,25 @@
   - 72-hour escrow lock timer
 - [x] Role Guard Middleware (`src/middleware.ts`) restricting buyer/driver routes (`/garage`, `/diagnose`, `/marketplace`, `/cart`, `/checkout`, `/orders`)
 - [x] Fixed Bottom Navigation Bar (`BottomNav`) across main views
-- [x] Unit Test Runner (`src/lib/test-runner.ts`) and Playwright visual verification
+- [x] Database seed script (`supabase/seed.sql`)
+
+## STAGE 4: Delivery & Mechanic App R-04 (COMPLETED)
+- [x] Customer Orders & Live Tracking (`OrderService`, `TrackingService`)
+  - `/orders` Customer escrow orders list with 72h countdown status
+  - `/orders/[id]` Order details with escrow progress bar & WAT timestamps
+  - `/orders/tracking/[id]` OPay-style live courier GPS tracking with `LocationPickerMap`
+  - `/delivery/confirm/[id]` Delivery confirmation with inspection checklist and atomic payout release
+- [x] Mechanic App R-04 (`MechanicService`)
+  - `/mechanic/onboarding` Reusing `LiveVerificationCamera` & `LocationPickerMap`
+  - `/mechanic/dashboard` Online/Offline dispatch toggle switch & 48px earnings display
+  - `/mechanic/jobs` Available nearby jobs list with radius filter & online check
+  - `/mechanic/jobs/[id]` Job details with sticky Accept/Decline CTAs
+  - `/mechanic/job/active/[id]` Active job checklist & photo proof upload
+  - `/mechanic/job/complete/[id]` Completion & 15% mechanic fee payout release
+  - `/mechanic/wallet` Mechanic OPay style wallet with 48px balance & withdrawal CTA
+  - Mechanic Bottom Navigation (`Jobs | Wallet | Me`)
+- [x] Role Guard Middleware enforcing R-04 Mechanic access on `/mechanic/*`
 
 ## Upcoming Stages
-- STAGE 4: Realtime Escrow, Disputes & Chat
-- STAGE 5: Admin Panel, Analytics & Platform Settings
+- STAGE 5: Admin Panel, Realtime Chat & Disputes
 - STAGE 6: Production Polish & Mobile Expo Preparation

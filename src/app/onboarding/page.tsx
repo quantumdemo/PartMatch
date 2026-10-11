@@ -43,6 +43,7 @@ export default function RoleSelectPage() {
     if (!selectedRole) return;
     if (typeof window !== "undefined") {
       localStorage.setItem("partmatch_selected_role", selectedRole);
+      document.cookie = `partmatch_user_role=${selectedRole}; path=/; max-age=86400; SameSite=Lax`;
     }
     router.push("/onboarding/auth");
   };
