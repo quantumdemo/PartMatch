@@ -80,6 +80,8 @@ export default function ProfilePicturePage() {
             <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
           </div>
           <p className="text-xs font-medium text-[#8A8A8A]">Step 4/7: Profile Photo</p>
         </div>

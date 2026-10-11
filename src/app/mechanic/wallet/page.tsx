@@ -29,7 +29,6 @@ export default function MechanicWalletPage() {
       const userId = session?.user?.id;
 
       if (userId) {
-        // Query wallet
         const { data: wallet } = await supabase
           .from("wallets")
           .select("available_balance")
@@ -38,7 +37,6 @@ export default function MechanicWalletPage() {
 
         setBalance(Number(wallet?.available_balance || 0));
 
-        // Query transactions
         const { data: txData } = await supabase
           .from("transactions")
           .select("*")
@@ -69,7 +67,7 @@ export default function MechanicWalletPage() {
         </button>
         <div>
           <h1 className="text-base font-bold text-[#121212]">Mechanic Payout Wallet</h1>
-          <p className="text-[11px] text-[#8A8A8A]">OPay-Style Instant Bank Withdrawals</p>
+          <p className="text-[11px] text-[#8A8A8A]">Instant Bank Withdrawals</p>
         </div>
       </header>
 
@@ -82,7 +80,7 @@ export default function MechanicWalletPage() {
       ) : (
         <>
           {/* 48px Balance Card */}
-          <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-5 space-y-3 shadow-sm">
+          <div className="bg-[#FFFFFF] border border-[#EAEAEA] rounded-[16px] p-5 space-y-3 shadow-sm">
             <span className="text-[10px] uppercase font-bold text-[#8A8A8A] tracking-wider">
               Withdrawable Balance
             </span>

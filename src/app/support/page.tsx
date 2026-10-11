@@ -72,7 +72,7 @@ export default function CustomerSupportPage() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-base font-bold text-[#121212]">OPay Support Center</h1>
+          <h1 className="text-base font-bold text-[#121212]">PartMatch Support Center</h1>
           <p className="text-[11px] text-[#8A8A8A]">24/7 Live Assistance & FAQs</p>
         </div>
       </header>

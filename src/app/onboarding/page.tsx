@@ -52,7 +52,7 @@ export default function RoleSelectPage() {
     <main className="min-h-screen bg-[#FFFBF5] text-[#121212] font-sans flex flex-col justify-between py-6 px-4">
       <div className="max-w-[440px] w-full mx-auto space-y-6 flex-1 flex flex-col justify-center">
 
-        {/* Top Progress Stepper */}
+        {/* Top Progress Stepper Header */}
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
@@ -60,8 +60,10 @@ export default function RoleSelectPage() {
             <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
           </div>
-          <p className="text-xs font-medium text-[#8A8A8A]">Step 1/5</p>
+          <p className="text-xs font-medium text-[#8A8A8A]">Step 1/7: Choose Role</p>
         </div>
 
         {/* Title & Subtitle */}
@@ -119,7 +121,7 @@ export default function RoleSelectPage() {
         </div>
       </div>
 
-      {/* Sticky Bottom OPay-Style CTA Button Container */}
+      {/* Sticky Bottom CTA Button Container */}
       <div className="sticky bottom-0 left-0 right-0 pt-4 pb-2 bg-[#FFFBF5]/90 backdrop-blur-md max-w-[440px] w-full mx-auto">
         <button
           type="button"

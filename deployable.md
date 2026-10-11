@@ -63,9 +63,9 @@ This release enforces the strict onboarding flow order, eliminates all mock/dumm
 25. `/mechanics`: Mobile mechanics near me query (`role = R-04` & `online_status = true`) with Mapbox tracking simulation.
 26. `/mechanics/[id]`: Mechanic profile & job assignment creating `mechanic_jobs` status `PENDING`.
 27. `/mechanics/job/[id]`: Mechanic en route live tracking with unmasked contact phone option upon acceptance.
-28. `/wallet`: OPay style wallet displaying real available balance, escrow locked balance, and transaction history filters.
+28. `/wallet`: Wallet card displaying real available balance, escrow locked balance, dynamic funding, and transaction history filters.
 29. `/me`: User profile displaying locked verified fields with Lucide Lock icon and `/me/request-change` form saving to `profile_change_requests`.
-30. `/support`: OPay support center with 8 categories grid, FAQ accordions from `faqs` table, and big `#FF4D1A` Live Chat CTA leading to `/support/chat/[id]`.
+30. `/support`: Support center with 8 categories grid, FAQ accordions from `faqs` table, and big `#FF4D1A` Live Chat CTA leading to `/support/chat/[id]`.
 31. `/notifications`: Realtime notifications list for announcements, order updates, and ticket replies.
 
 ---

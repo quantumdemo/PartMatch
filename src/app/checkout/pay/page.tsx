@@ -115,7 +115,7 @@ function PaymentMethodContent() {
             </div>
             <div>
               <h3 className="font-bold text-sm text-[#121212]">Instant Bank Transfer</h3>
-              <p className="text-xs text-[#8A8A8A]">GTB, Access, OPay, Moniepoint NUBAN</p>
+              <p className="text-xs text-[#8A8A8A]">GTB, Access, Moniepoint, Zenith NUBAN</p>
             </div>
           </div>
           <input type="radio" checked={method === "bank"} readOnly className="accent-[#FF4D1A]" />

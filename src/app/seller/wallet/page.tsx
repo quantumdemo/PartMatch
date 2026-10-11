@@ -31,7 +31,6 @@ export default function SellerWalletPage() {
       const userId = session?.user?.id;
 
       if (userId) {
-        // Query wallet
         const { data: wallet } = await supabase
           .from("wallets")
           .select("available_balance")
@@ -40,7 +39,6 @@ export default function SellerWalletPage() {
 
         setAvailableBalance(Number(wallet?.available_balance || 0));
 
-        // Query pending escrow
         const { data: escrows } = await supabase
           .from("escrow_transactions")
           .select("amount")
@@ -50,7 +48,6 @@ export default function SellerWalletPage() {
         const pending = (escrows || []).reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
         setEscrowBalance(pending);
 
-        // Query transactions
         let query = supabase
           .from("transactions")
           .select("*")
@@ -86,7 +83,7 @@ export default function SellerWalletPage() {
         </button>
         <div>
           <h1 className="text-base font-bold text-[#121212]">Merchant Sales Wallet</h1>
-          <p className="text-[11px] text-[#8A8A8A]">OPay-Style Direct Bank Payouts</p>
+          <p className="text-[11px] text-[#8A8A8A]">Direct Bank Payouts</p>
         </div>
       </header>
 
@@ -97,7 +94,6 @@ export default function SellerWalletPage() {
         </div>
       ) : (
         <>
-          {/* 48px Balance Card */}
           <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-5 space-y-3 shadow-sm">
             <span className="text-[10px] uppercase font-bold text-[#8A8A8A] tracking-wider">
               Withdrawable Sales Payout
@@ -126,7 +122,6 @@ export default function SellerWalletPage() {
             </button>
           </div>
 
-          {/* Filter Tabs */}
           <div className="flex gap-2 text-xs font-bold">
             {["ALL", "ESCROW", "CREDIT", "DEBIT"].map((tab) => (
               <button
@@ -143,7 +138,6 @@ export default function SellerWalletPage() {
             ))}
           </div>
 
-          {/* Ledger History */}
           <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-3 shadow-sm">
             <div className="flex items-center justify-between border-b border-[#EAEAEA] pb-2">
               <h2 className="text-xs font-bold text-[#121212] flex items-center gap-1.5">
