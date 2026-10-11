@@ -4,34 +4,30 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const userRoleCookie = request.cookies.get("partmatch_user_role")?.value;
-  const userRole = userRoleCookie || "buyer";
 
   // Admin-only routes (R-05)
   if (pathname.startsWith("/admin")) {
-    const isAdminAllowed = userRole === "admin" || !userRoleCookie; // allow initial setup if cookie unset
-    if (!isAdminAllowed) {
+    if (!userRoleCookie || userRoleCookie !== "admin") {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
   }
 
   // Seller-only routes (R-03)
   if (pathname.startsWith("/seller")) {
-    if (!userRoleCookie && pathname.startsWith("/seller/onboarding")) {
+    if (pathname.startsWith("/seller/onboarding") && !userRoleCookie) {
       return NextResponse.next();
     }
-    const isSellerRouteAllowed = userRole === "seller" || userRole === "admin" || !userRoleCookie;
-    if (!isSellerRouteAllowed) {
+    if (!userRoleCookie || (userRoleCookie !== "seller" && userRoleCookie !== "admin")) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
   }
 
   // Mechanic-only routes (R-04)
   if (pathname.startsWith("/mechanic")) {
-    if (!userRoleCookie && pathname.startsWith("/mechanic/onboarding")) {
+    if (pathname.startsWith("/mechanic/onboarding") && !userRoleCookie) {
       return NextResponse.next();
     }
-    const isMechanicRouteAllowed = userRole === "mechanic" || userRole === "admin" || !userRoleCookie;
-    if (!isMechanicRouteAllowed) {
+    if (!userRoleCookie || (userRoleCookie !== "mechanic" && userRoleCookie !== "admin")) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
   }
@@ -40,8 +36,8 @@ export function middleware(request: NextRequest) {
   const driverRoutes = ["/garage", "/diagnose", "/marketplace", "/cart", "/checkout"];
   const isDriverRoute = driverRoutes.some((route) => pathname.startsWith(route));
 
-  if (isDriverRoute) {
-    const isSellerOrMechanic = userRole === "seller" || userRole === "mechanic";
+  if (isDriverRoute && userRoleCookie) {
+    const isSellerOrMechanic = userRoleCookie === "seller" || userRoleCookie === "mechanic";
     if (isSellerOrMechanic) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }

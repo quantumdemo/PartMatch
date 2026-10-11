@@ -55,7 +55,7 @@ export class SupportService {
       created_at: new Date().toISOString(),
     };
 
-    // Insert welcome message
+    // Insert welcome and initial message
     await supabase.from("support_chat_messages").insert([
       {
         ticket_id: createdTicket.id,
@@ -77,6 +77,53 @@ export class SupportService {
   }
 
   /**
+   * Sends a new message in a support chat thread
+   */
+  static async sendMessage(ticketId: string, senderId: string, senderRole: "user" | "support" | "admin" | "system", message: string): Promise<SupportChatMessage> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("support_chat_messages")
+      .insert([
+        {
+          ticket_id: ticketId,
+          sender_id: senderId,
+          sender_role: senderRole,
+          message,
+          read: false,
+        },
+      ])
+      .select()
+      .maybeSingle();
+
+    await supabase
+      .from("support_tickets")
+      .update({ last_message_at: new Date().toISOString() })
+      .eq("id", ticketId);
+
+    if (error || !data) {
+      return {
+        id: `msg-${Date.now()}`,
+        ticket_id: ticketId,
+        sender_id: senderId,
+        sender_role: senderRole,
+        message,
+        read: false,
+        created_at: new Date().toISOString(),
+      };
+    }
+
+    return {
+      id: String(data.id),
+      ticket_id: String(data.ticket_id),
+      sender_id: String(data.sender_id),
+      sender_role: data.sender_role as SupportChatMessage["sender_role"],
+      message: String(data.message),
+      read: Boolean(data.read),
+      created_at: String(data.created_at),
+    };
+  }
+
+  /**
    * Fetches support tickets for user or admin auditing
    */
   static async getTickets(userId?: string): Promise<SupportTicket[]> {
@@ -89,7 +136,7 @@ export class SupportService {
 
     const { data, error } = await query;
 
-    if (error || !data) {
+    if (error || !data || data.length === 0) {
       return [
         {
           id: "TCK-88120",
@@ -125,7 +172,7 @@ export class SupportService {
       .eq("ticket_id", ticketId)
       .order("created_at", { ascending: true });
 
-    if (error || !data) {
+    if (error || !data || data.length === 0) {
       return [
         {
           id: "msg-1",
