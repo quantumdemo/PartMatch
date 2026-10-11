@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, History, Lock } from "lucide-react";
 import { WalletService, WalletBalanceInfo, WalletTransaction } from "@/lib/services/walletService";
@@ -12,18 +12,23 @@ export default function SellerWalletPage() {
 
   const [balances, setBalances] = useState<WalletBalanceInfo | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([
+  const fetchWallet = useCallback(async () => {
+    setLoading(true);
+    const [bal, txs] = await Promise.all([
       WalletService.getWalletBalance(sellerId),
-      WalletService.getTransactions(sellerId),
-    ]).then(([bal, txs]) => {
-      setBalances(bal);
-      setTransactions(txs);
-      setLoading(false);
-    });
-  }, [sellerId]);
+      WalletService.getTransactions(sellerId, filter),
+    ]);
+    setBalances(bal);
+    setTransactions(txs);
+    setLoading(false);
+  }, [sellerId, filter]);
+
+  useEffect(() => {
+    fetchWallet();
+  }, [fetchWallet]);
 
   if (loading || !balances) {
     return (
@@ -75,6 +80,23 @@ export default function SellerWalletPage() {
           <ArrowUpRight className="w-4 h-4" />
           <span>Withdraw to Bank Account</span>
         </button>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2 text-xs font-bold">
+        {["ALL", "ESCROW", "CREDIT", "DEBIT"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFilter(tab)}
+            className={`px-3 py-1.5 rounded-full border transition-colors ${
+              filter === tab
+                ? "bg-[#121212] text-white border-[#121212]"
+                : "bg-white text-[#8A8A8A] border-[#EAEAEA]"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* Merchant Transactions Ledger */}

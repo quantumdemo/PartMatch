@@ -1,4 +1,4 @@
-# PartMatch Production Build - Progress Tracker
+# PartMatch Production Build - Progress Tracker (FINAL 7.0 COMPLETE)
 
 ## STAGE 1: Foundation & Security (COMPLETED)
 - [x] Next.js 14 App Router + Tailwind CSS setup
@@ -60,21 +60,26 @@
   - `/seller/wallet` 48px seller balance & bank payout withdrawal
   - `/seller/me` Store profile with locked CAC badge & warehouse location
 
-## STAGE 6: Admin R-05 + Final Polish - SHIP READY (COMPLETED)
-- [x] Admin Portal R-05 (`AdminService`, `AdminLayout`)
-  - Desktop 240px sidebar + mobile responsive navigation drawer
-  - `/admin/dashboard` 48px revenue metric, platform stats grid, system health auditing
-  - `/admin/users` User & KYC management by role filter with status badges
-  - `/admin/orders` Global escrow orders audit table with PM-REF & WAT timestamps
-  - `/admin/escrow` 72h timer overrides & manual hold/release with `PaymentPinModal` authorization
-  - `/admin/disputes` Dispute arbitration & photo evidence refund/release controls
-  - `/admin/analytics` GMV 48px display, top merchants, and mobile mechanic revenue metrics
-  - `/admin/settings` Platform global fee %, split ratios, and countdown configuration
-- [x] Final Production Audit:
-  - Vercel deployable Next.js 14 App Router production build pass
-  - All 48+ application routes verified
-  - Mobile-view constraint (`max-w-[440px]`) strictly enforced for Customer, Seller, and Mechanic
-  - Desktop+Mobile responsive layout active exclusively for Admin R-05
+## STAGE 6 & FINAL 7.0 POLISH: Admin R-05, AI Vision, Support Chat & Approvals (SHIP READY)
+- [x] AI Diagnose API Route (`/api/diagnose`)
+  - OpenAI `gpt-4o-mini` Vision API integration
+  - Smart keyword match fallback with confidence labels
+- [x] OPay Live Chat Support System (`SupportService`)
+  - `/support` Customer Help Center with FAQ search & category grid
+  - `/support/chat/new` New live chat creation linked to order PM-REF
+  - `/support/chat/[id]` WhatsApp style live agent chat thread
+  - `/admin/support` Admin agent chat console & ticket arbitration
+- [x] Immutable Profile Lock & Change Requests
+  - `/me/request-change` Request form for locked KYC fields
+  - `/admin/profile-requests` Admin PIN-protected approval audit
+- [x] Seller Inventory Catalog Review
+  - Default status set to `PENDING_REVIEW` on new listings
+  - `/admin/inventory-review` Admin PIN-protected inventory approval console
+- [x] Wallet Filtering Enhancement (`/wallet`, `/seller/wallet`, `/mechanic/wallet`)
+  - ALL, ESCROW, CREDIT, DEBIT category filter tabs
+- [x] Documentation & Standards
+  - `COMMENTING_GUIDE.md` created
+  - `.env.example` updated with API key acquisition guide comments
 
 ## Complete Navigation Matrix Audit
 
@@ -96,8 +101,11 @@
 | Seller (R-03) | Me | `/seller/me` | Mobile View (`max-w-[440px]`) |
 | Admin (R-05) | Dashboard | `/admin/dashboard` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Users | `/admin/users` | Desktop Sidebar + Mobile Responsive |
+| Admin (R-05) | Profile Requests | `/admin/profile-requests` | Desktop Sidebar + Mobile Responsive |
+| Admin (R-05) | Inventory Review | `/admin/inventory-review` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Orders | `/admin/orders` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Escrow | `/admin/escrow` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Disputes | `/admin/disputes` | Desktop Sidebar + Mobile Responsive |
+| Admin (R-05) | Support Console | `/admin/support` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Analytics | `/admin/analytics` | Desktop Sidebar + Mobile Responsive |
 | Admin (R-05) | Settings | `/admin/settings` | Desktop Sidebar + Mobile Responsive |

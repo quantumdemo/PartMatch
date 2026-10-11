@@ -2,9 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Scan, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, Scan, AlertCircle } from "lucide-react";
 import { InventoryService } from "@/lib/services/inventoryService";
-import { AIService } from "@/lib/services/aiService";
 import { InfoTooltip } from "@/components/InfoTooltip";
 
 export default function AddPartPage() {
@@ -23,14 +22,23 @@ export default function AddPartPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleAiAutoFill = async () => {
-    setAiScanning(true);
-    const result = await AIService.scanAndIdentifyPart(title || "Brake Pad");
-    setAiScanning(false);
+    try {
+      setAiScanning(true);
+      const res = await fetch("/api/diagnose", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: title || "Brake Pad" }),
+      });
+      const result = await res.json();
+      setAiScanning(false);
 
-    if (result) {
-      setTitle(result.part_name);
-      setPartNumber(result.oem_number);
-      setPrice(result.estimated_price_ngn);
+      if (result?.part_name) {
+        setTitle(result.part_name);
+        setPartNumber(result.oem_guess || "OEM-REF");
+        setPrice(result.price_range_ngn || 18500);
+      }
+    } catch {
+      setAiScanning(false);
     }
   };
 
@@ -87,7 +95,7 @@ export default function AddPartPage() {
         <div className="flex items-center gap-2.5">
           <Scan className="w-5 h-5 text-[#FF4D1A]" />
           <div>
-            <p className="text-xs font-bold">Auto-Fill specs using AI</p>
+            <p className="text-xs font-bold">Auto-Fill specs using AI API</p>
             <p className="text-[10px] text-[#8A8A8A]">Auto-detect OEM part number & catalog specs</p>
           </div>
         </div>

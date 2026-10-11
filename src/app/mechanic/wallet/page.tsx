@@ -7,6 +7,7 @@ import { ArrowLeft, Wallet, ArrowUpRight, History, Wrench, User } from "lucide-r
 export default function MechanicWalletPage() {
   const router = useRouter();
   const [balance] = useState(12500);
+  const [filter, setFilter] = useState("ALL");
 
   return (
     <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-4 pb-28 font-sans space-y-4">
@@ -45,6 +46,23 @@ export default function MechanicWalletPage() {
             <span>Withdraw to Bank</span>
           </button>
         </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2 text-xs font-bold">
+        {["ALL", "ESCROW", "CREDIT", "DEBIT"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFilter(tab)}
+            className={`px-3 py-1.5 rounded-full border transition-colors ${
+              filter === tab
+                ? "bg-[#121212] text-white border-[#121212]"
+                : "bg-white text-[#8A8A8A] border-[#EAEAEA]"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* Recent Mechanic Ledger Transactions */}

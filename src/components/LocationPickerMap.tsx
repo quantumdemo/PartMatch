@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MapPin, Navigation } from "lucide-react";
 
 interface LocationPickerMapProps {
@@ -21,14 +21,19 @@ export function LocationPickerMap({
   const [address, setAddress] = useState<string>(initialAddress || "Lagos, Nigeria");
   const [locating, setLocating] = useState<boolean>(false);
 
+  const callbackRef = useRef(onLocationSelect);
+  useEffect(() => {
+    callbackRef.current = onLocationSelect;
+  }, [onLocationSelect]);
+
   // Trigger initial selection propagation
   useEffect(() => {
-    onLocationSelect({
+    callbackRef.current({
       latitude: lat,
       longitude: lng,
       formattedAddress: address,
     });
-  }, [lat, lng, address, onLocationSelect]);
+  }, [lat, lng, address]);
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -48,7 +53,7 @@ export function LocationPickerMap({
         setAddress(formattedAddress);
         setLocating(false);
 
-        onLocationSelect({ latitude, longitude, formattedAddress });
+        callbackRef.current({ latitude, longitude, formattedAddress });
       },
       (error) => {
         console.error("Error getting location:", error);
@@ -83,7 +88,7 @@ export function LocationPickerMap({
           value={address}
           onChange={(e) => {
             setAddress(e.target.value);
-            onLocationSelect({ latitude: lat, longitude: lng, formattedAddress: e.target.value });
+            callbackRef.current({ latitude: lat, longitude: lng, formattedAddress: e.target.value });
           }}
           placeholder="Enter detailed shop/workshop address e.g. 14 Ladipo Auto Market, Mushin, Lagos"
           className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#FF4D1A]"
