@@ -3,13 +3,22 @@ import { NextResponse, type NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Read user role from cookie or header (default to 'buyer')
   const userRoleCookie = request.cookies.get("partmatch_user_role")?.value;
   const userRole = userRoleCookie || "buyer";
 
+  // Seller-only routes
+  if (pathname.startsWith("/seller")) {
+    if (!userRoleCookie && pathname.startsWith("/seller/onboarding")) {
+      return NextResponse.next();
+    }
+    const isSellerRouteAllowed = userRole === "seller" || userRole === "admin" || !userRoleCookie;
+    if (!isSellerRouteAllowed) {
+      return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+  }
+
   // Mechanic-only routes
   if (pathname.startsWith("/mechanic")) {
-    // If no explicit cookie is set, allow mechanic onboarding for setup
     if (!userRoleCookie && pathname.startsWith("/mechanic/onboarding")) {
       return NextResponse.next();
     }
@@ -35,6 +44,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/seller/:path*",
     "/mechanic/:path*",
     "/garage/:path*",
     "/diagnose/:path*",

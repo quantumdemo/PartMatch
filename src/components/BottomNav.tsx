@@ -3,12 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Car, Package, Wallet, User, Wrench } from "lucide-react";
+import { Home, Car, Package, Wallet, User, Wrench, Boxes } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
 
   const isMechanicRoute = pathname.startsWith("/mechanic");
+  const isSellerRoute = pathname.startsWith("/seller");
 
   const CUSTOMER_NAV = [
     { href: "/dashboard", label: "Home", icon: Home },
@@ -25,7 +26,15 @@ export function BottomNav() {
     { href: "/mechanic/me", label: "Me", icon: User },
   ];
 
-  const NAV_ITEMS = isMechanicRoute ? MECHANIC_NAV : CUSTOMER_NAV;
+  const SELLER_NAV = [
+    { href: "/seller/dashboard", label: "Home", icon: Home },
+    { href: "/seller/orders", label: "Orders", icon: Package },
+    { href: "/seller/inventory", label: "Inventory", icon: Boxes },
+    { href: "/seller/wallet", label: "Wallet", icon: Wallet },
+    { href: "/seller/me", label: "Me", icon: User },
+  ];
+
+  const NAV_ITEMS = isSellerRoute ? SELLER_NAV : isMechanicRoute ? MECHANIC_NAV : CUSTOMER_NAV;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#FFFFFF] border-t border-[#EAEAEA] max-w-[440px] mx-auto h-16 flex items-center justify-around px-2 shadow-lg">
