@@ -4,10 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   MessageSquare,
-  HelpCircle,
   Phone,
   Mail,
-  ChevronRight,
   Search,
   Wallet,
   Package,

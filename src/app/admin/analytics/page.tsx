@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BarChart3, TrendingUp, Store, Wrench } from "lucide-react";
+import { TrendingUp, Store, Wrench } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 
 export default function AdminAnalyticsPage() {

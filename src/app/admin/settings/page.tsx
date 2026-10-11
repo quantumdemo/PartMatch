@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Settings, Save, CheckCircle2 } from "lucide-react";
+import { Save, CheckCircle2 } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 
 export default function AdminSettingsPage() {

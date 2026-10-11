@@ -11,7 +11,7 @@ export default function AddPartPage() {
   const sellerId = "seller-001";
 
   const [title, setTitle] = useState("");
-  const [brand, setBrand] = useState("Toyota OEM");
+  const [brand] = useState("Toyota OEM");
   const [partNumber, setPartNumber] = useState("");
   const [price, setPrice] = useState<number>(18500);
   const [stockQuantity, setStockQuantity] = useState<number>(5);
