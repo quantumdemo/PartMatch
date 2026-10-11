@@ -1,25 +1,39 @@
-# PartMatch Progress Log - STAGE 2 of 6
+# PartMatch Production Build - Progress Tracker
 
-**Status**: COMPLETED
-**Current Stage**: STAGE 2 - Auth, Live Verification, Role-Based KYC, Location, Payment PIN & Bank Account Integration
+## STAGE 1: Foundation & Security (COMPLETED)
+- [x] Next.js 14 App Router + Tailwind CSS setup
+- [x] Complete Supabase SQL migration (`supabase/migrations/20261011000000_partmatch_stage1_schema.sql`)
+  - 13 core tables with table comments and column specifications
+  - Strict RLS policies (`auth.uid() = user_id`)
+  - Atomic RPC functions: `credit_wallet`, `debit_wallet`, `create_transaction`
+  - Immutable transactions ledger trigger
+- [x] WAT Nigerian Timezone utility (`src/lib/timezone.ts`)
+- [x] Zod schemas & sanitization (`src/lib/validation.ts`, `src/lib/security.ts`)
+- [x] Documentation (`README.md`, `ARCHITECTURE.md`, `ENV_SETUP_GUIDE.md`, `SECURITY.md`, `.env.example`)
 
----
+## STAGE 2: Auth, Live Verification, KYC, PIN, Bank (COMPLETED)
+- [x] `AuthService` with Email OTP and 60s resend timer
+- [x] Live Face Blink Verification (`useLiveVerification` and `LiveVerificationCamera`)
+- [x] Role-Based KYC Onboarding (`RoleKYCForm` for Buyer/Driver, Seller, Mechanic, Fleet)
+- [x] Payment PIN Service (`PinService`, `PaymentPinModal`) with bcrypt hashing and 3-attempt lockout
+- [x] Bank Account Verification (`BankService`, `/api/banks`, `/api/banks/resolve`)
+- [x] Frontend onboarding pages (`/onboarding`, `/onboarding/auth`, `/onboarding/live-verify`, `/onboarding/kyc`, `/onboarding/pin`, `/login`, `/wallet/bank-accounts`)
 
-## Task Progress Checklist
+## STAGE 3: Marketplace & Escrow Core (COMPLETED)
+- [x] Garage Vehicle Management (`VehicleService`, `/garage`, `/garage/add`)
+- [x] AI Diagnostics & Compatibility (`AIService`, `/diagnose`, `/diagnose/scanning`, `/diagnose/result`, `/diagnose/fitment`, `/diagnose/search`)
+- [x] Marketplace & Comparative Sellers (`MarketplaceService`, `/marketplace/[partId]`, `/seller/[id]`)
+  - 48px Price Typography (`text-[48px] font-extrabold`)
+  - Comparative seller offers with masked phone numbers (`0803 *** 4829`)
+  - Skeleton, empty, and error/retry states
+- [x] Escrow Checkout & Split Logic (`EscrowService`, `/cart`, `/checkout/escrow`, `/checkout/pay`, `/orders/placed`)
+  - 85% Seller / 15% Mechanic / 5% Platform split calculation
+  - 72-hour escrow lock timer
+- [x] Role Guard Middleware (`src/middleware.ts`) restricting buyer/driver routes (`/garage`, `/diagnose`, `/marketplace`, `/cart`, `/checkout`, `/orders`)
+- [x] Fixed Bottom Navigation Bar (`BottomNav`) across main views
+- [x] Unit Test Runner (`src/lib/test-runner.ts`) and Playwright visual verification
 
-- [x] **STEP 1/8**: Stage 2 Initialization & Dependencies Installation
-- [x] **STEP 2/8**: Auth Service, Resend Email OTP (60s Countdown + 5/hr WAT Rate Limiter)
-- [x] **STEP 3/8**: Live Profile Verification with Blink Detection (`face-api`) & Storage
-- [x] **STEP 4/8**: Tooltip Dictionary & Reusable `<InfoTooltip />` Component
-- [x] **STEP 5/8**: Role-Specific KYC Forms (Buyer, Seller, Mechanic) + Mapbox Location Picker + Profile Lock
-- [x] **STEP 6/8**: Payment PIN System (Setup, Change, Reset via OTP+NIN, 3-Fail Lockout, 4-Box Modal)
-- [x] **STEP 7/8**: Bank Account Verification & Paystack Recipient Integration
-- [x] **STEP 8/8**: Unit Tests, Build Verification & Pre-Commit Steps
-
-**STEP WRAP - Pages created using existing components - Onboarding YES**
-- `/onboarding/page.tsx` (R-01..04 Role Select - Polished Mobile-First UI)
-- `/onboarding/auth/page.tsx` (Google/Apple + Resend Email OTP 60s + Password)
-- `/onboarding/live-verify/page.tsx` (Live Face Blink Detection Camera)
-- `/onboarding/kyc/page.tsx` (Role KYC Forms + Mapbox Pin + Profile Lock)
-- `/onboarding/pin/page.tsx` (Set 4-Digit Payment PIN Enter + Confirm)
-- `/(auth)/login/page.tsx` (Login page)
+## Upcoming Stages
+- STAGE 4: Realtime Escrow, Disputes & Chat
+- STAGE 5: Admin Panel, Analytics & Platform Settings
+- STAGE 6: Production Polish & Mobile Expo Preparation

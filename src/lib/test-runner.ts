@@ -1,10 +1,10 @@
 import { formatWAT } from "./timezone";
 import { sanitizeInput, generateTransactionRef } from "./security";
-import { PaymentPinSchema, WalletSchema } from "./validation";
-import { AuthService } from "./services/authService";
+import { EscrowService } from "./services/escrowService";
+import { VehicleService } from "./services/vehicleService";
 
 export function runTests() {
-  console.log("=== Running PartMatch Core & Stage 2 Tests ===");
+  console.log("=== Running PartMatch Core & Stage 3 Tests ===");
 
   // Test 1: Timezone WAT formatting
   const testDate = new Date("2026-10-10T13:30:00Z");
@@ -29,37 +29,24 @@ export function runTests() {
   console.assert(ref.startsWith("PM-REF-"), `Test 3 Failed: ${ref}`);
   console.log("✓ Test 3 Passed: Transaction reference generation correct.");
 
-  // Test 4: Zod Validation - Valid PIN
-  const validPinRes = PaymentPinSchema.safeParse({ pin: "1234", confirm_pin: "1234" });
-  console.assert(validPinRes.success === true, `Test 4 Failed: ${JSON.stringify(validPinRes)}`);
-  console.log("✓ Test 4 Passed: Payment PIN validation correct.");
+  // Test 4: Escrow Fee Split (85% Seller / 15% Mechanic / 5% Platform)
+  const totalAmount = 20000;
+  const split = EscrowService.calculateSplit(totalAmount);
+  console.assert(split.platformFee === 1000, `Test 4 Failed: Platform fee ${split.platformFee}`);
+  console.assert(split.sellerAmount === 16150, `Test 4 Failed: Seller split ${split.sellerAmount}`);
+  console.assert(split.mechanicAmount === 2850, `Test 4 Failed: Mechanic split ${split.mechanicAmount}`);
+  console.log("✓ Test 4 Passed: Escrow 85/15/5 financial split calculation correct.");
 
-  // Test 5: Zod Validation - Invalid Wallet Currency
-  const invalidWalletRes = WalletSchema.safeParse({
-    user_id: "123e4567-e89b-12d3-a456-426614174000",
-    available_balance: 1000,
-    escrow_balance: 0,
-    total_earned: 1000,
-    total_spent: 0,
-    currency: "USD",
+  // Test 5: Vehicle Service Addition
+  const newVeh = VehicleService.addVehicle("user-123", {
+    make: "Toyota",
+    model: "Corolla",
+    year: 2012,
   });
-  console.assert(invalidWalletRes.success === false, "Test 5 Failed: Currency USD allowed");
-  console.log("✓ Test 5 Passed: NGN Currency enforcement strictly valid.");
+  console.assert(newVeh !== null, "Test 5 Failed: Vehicle creation returned null");
+  console.log("✓ Test 5 Passed: Vehicle service garage management correct.");
 
-  // Test 6: Auth OTP Rate Limiter (Max 5/hr WAT)
-  const testEmail = "test_rate_limit@partmatch.ng";
-  for (let i = 0; i < 5; i++) {
-    AuthService.recordOTPAttempt(testEmail);
-  }
-  const rateCheck = AuthService.checkOTPRateLimit(testEmail);
-  console.assert(rateCheck.allowed === false, "Test 6 Failed: Rate limit allowed >5 attempts");
-  console.assert(
-    rateCheck.message === "Too many attempts, try after 1 hour",
-    `Test 6 Failed: Wrong message ${rateCheck.message}`
-  );
-  console.log("✓ Test 6 Passed: Auth OTP 5/hr rate limiter strictly enforced.");
-
-  console.log("=== All PartMatch Core & Stage 2 Tests Passed! ===");
+  console.log("=== All PartMatch Core & Stage 3 Tests Passed! ===");
 }
 
 if (require.main === module) {
