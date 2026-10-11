@@ -16,14 +16,20 @@ import {
   ShieldCheck,
   HelpCircle,
   Bell,
+  MessageSquare,
+  UserCheck,
+  Boxes,
 } from "lucide-react";
 
 const ADMIN_NAV = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users & KYC", icon: Users },
+  { href: "/admin/profile-requests", label: "Profile Requests", icon: UserCheck },
+  { href: "/admin/inventory-review", label: "Inventory Review", icon: Boxes },
   { href: "/admin/orders", label: "All Orders", icon: Package },
   { href: "/admin/escrow", label: "Escrow Control", icon: ShieldAlert },
   { href: "/admin/disputes", label: "Disputes", icon: AlertOctagon },
+  { href: "/admin/support", label: "Support Chat Console", icon: MessageSquare },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/settings", label: "Platform Settings", icon: Settings },
 ];
@@ -86,9 +92,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-xl bg-[#FFFBF5] border border-[#EAEAEA]">
+            <Link href="/admin/support" className="p-2 rounded-xl bg-[#FFFBF5] border border-[#EAEAEA]">
               <HelpCircle className="w-4 h-4 text-[#8A8A8A]" />
-            </button>
+            </Link>
             <button className="p-2 rounded-xl bg-[#FFFBF5] border border-[#EAEAEA] relative">
               <Bell className="w-4 h-4 text-[#8A8A8A]" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF4D1A] rounded-full" />

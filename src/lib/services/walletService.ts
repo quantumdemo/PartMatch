@@ -46,15 +46,21 @@ export class WalletService {
   }
 
   /**
-   * Fetches immutable transaction ledger logs from Supabase `transactions`
+   * Fetches immutable transaction ledger logs from Supabase `transactions` with optional filter
    */
-  static async getTransactions(userId: string): Promise<WalletTransaction[]> {
+  static async getTransactions(userId: string, filterType = "ALL"): Promise<WalletTransaction[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("transactions")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
+
+    if (filterType === "CREDIT") query = query.eq("type", "INFLOW");
+    if (filterType === "DEBIT") query = query.eq("type", "OUTFLOW");
+    if (filterType === "ESCROW") query = query.ilike("category", "%ESCROW%");
+
+    const { data, error } = await query;
 
     if (error || !data) {
       return [
@@ -63,6 +69,14 @@ export class WalletService {
           reference: "PM-REF-88910023",
           category: "ESCROW_RELEASE",
           amount: 18500,
+          type: "INFLOW",
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: "tx-2",
+          reference: "PM-REF-44210088",
+          category: "FUND_WALLET",
+          amount: 50000,
           type: "INFLOW",
           created_at: new Date().toISOString(),
         },
