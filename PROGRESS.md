@@ -17,7 +17,7 @@
 - [x] **STEP 8/8**: Unit Tests, Build Verification & Pre-Commit Steps
 
 **STEP WRAP - Pages created using existing components - Onboarding YES**
-- `/onboarding/page.tsx` (R-01..04 Role Select)
+- `/onboarding/page.tsx` (R-01..04 Role Select - Polished Mobile-First UI)
 - `/onboarding/auth/page.tsx` (Google/Apple + Resend Email OTP 60s + Password)
 - `/onboarding/live-verify/page.tsx` (Live Face Blink Detection Camera)
 - `/onboarding/kyc/page.tsx` (Role KYC Forms + Mapbox Pin + Profile Lock)
