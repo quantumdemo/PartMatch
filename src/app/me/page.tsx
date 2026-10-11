@@ -149,8 +149,8 @@ export default function CustomerProfilePage() {
             <p className="text-xs font-bold text-[#121212]">Security & Support</p>
 
             <button
-              onClick={() => router.push("/onboarding/pin")}
-              className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] flex items-center justify-between text-xs font-bold text-[#121212]"
+              onClick={() => router.push("/me/security/reset-pin")}
+              className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] flex items-center justify-between text-xs font-bold text-[#121212] hover:border-[#FF4D1A] transition"
             >
               <span className="flex items-center gap-2">
                 <Settings className="w-4 h-4 text-[#FF4D1A]" /> Reset Transaction PIN
@@ -160,7 +160,7 @@ export default function CustomerProfilePage() {
 
             <button
               onClick={() => router.push("/support")}
-              className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] flex items-center justify-between text-xs font-bold text-[#121212]"
+              className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] flex items-center justify-between text-xs font-bold text-[#121212] hover:border-[#FF4D1A] transition"
             >
               <span className="flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-[#8A8A8A]" /> Support & Live Chat

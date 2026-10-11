@@ -1,36 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { Lock, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import { PinService } from "@/lib/services/pinService";
 import { createClient } from "@/lib/supabase/client";
 
-function OnboardingPINContent() {
-  const searchParams = useSearchParams();
-  const fromSource = searchParams?.get("from") || "";
-  const isSettingsMode = fromSource === "settings" || fromSource === "dashboard" || fromSource === "wallet";
-
+export default function OnboardingPINPage() {
   const [userId, setUserId] = useState<string>("dev-user-id");
-  const [currentPin, setCurrentPin] = useState<string[]>(["", "", "", ""]);
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState<string[]>(["", "", "", ""]);
-  const [step, setStep] = useState<"verify_current" | "enter" | "confirm">(
-    isSettingsMode ? "verify_current" : "enter"
-  );
+  const [step, setStep] = useState<"enter" | "confirm">("enter");
 
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
   const router = useRouter();
-
-  const currentRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
 
   const enterRefs = [
     useRef<HTMLInputElement>(null),
@@ -54,20 +40,6 @@ function OnboardingPINContent() {
     }
     loadUser();
   }, []);
-
-  const handleCurrentDigit = (index: number, val: string) => {
-    if (!/^\d*$/.test(val)) return;
-    const newCurrent = [...currentPin];
-    newCurrent[index] = val.slice(-1);
-    setCurrentPin(newCurrent);
-    setError(null);
-
-    if (val && index < 3) currentRefs[index + 1].current?.focus();
-    if (newCurrent.every((d) => d !== "")) {
-      // Auto verify current PIN & move to enter new PIN
-      setStep("enter");
-    }
-  };
 
   const handleEnterDigit = (index: number, val: string) => {
     if (!/^\d*$/.test(val)) return;
@@ -122,39 +94,24 @@ function OnboardingPINContent() {
   return (
     <main className="min-h-screen bg-[#FFFBF5] text-[#121212] font-sans p-4 flex flex-col justify-between max-w-[440px] mx-auto">
       <div className="space-y-6 pt-4 pb-24">
-        {/* Progress Header - Only show if in onboarding flow */}
-        {!isSettingsMode ? (
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
-            </div>
-            <p className="text-xs font-medium text-[#8A8A8A]">Step 6/7: Transaction PIN</p>
+        {/* First Time Onboarding Stepper Header */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-xs text-[#8A8A8A] hover:text-[#121212] transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Settings</span>
-          </button>
-        )}
+          <p className="text-xs font-medium text-[#8A8A8A]">Step 6/7: Transaction PIN</p>
+        </div>
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">
-            {isSettingsMode ? "Reset / Change Transaction PIN" : "Set Transaction PIN"}
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">Set Transaction PIN</h1>
           <p className="text-xs text-[#8A8A8A]">
-            {isSettingsMode
-              ? "Security Center: Verify your current PIN to configure a new 4-digit transaction authorization PIN."
-              : "Set a secret 4-digit PIN for authorizing escrow payouts and withdrawals."}
+            Set a secret 4-digit PIN for authorizing escrow payouts and withdrawals.
           </p>
         </div>
 
@@ -168,53 +125,24 @@ function OnboardingPINContent() {
         {success ? (
           <div className="p-6 bg-white border border-[#EAEAEA] rounded-[16px] text-center space-y-3 shadow-sm">
             <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-            <h3 className="text-lg font-extrabold text-[#121212]">
-              {isSettingsMode ? "PIN Updated Successfully!" : "PIN Set Successfully!"}
-            </h3>
+            <h3 className="text-lg font-extrabold text-[#121212]">PIN Set Successfully!</h3>
             <p className="text-xs text-[#8A8A8A]">
-              Your 4-digit PIN has been bcrypt hashed and updated in your security profile.
+              Your 4-digit PIN has been bcrypt hashed and stored securely.
             </p>
             <button
               type="button"
-              onClick={() => router.push(isSettingsMode ? "/me" : "/onboarding/bank")}
+              onClick={() => router.push("/onboarding/bank")}
               className="w-full h-12 bg-[#FF4D1A] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm"
             >
-              <span>{isSettingsMode ? "Return to Profile" : "Continue to Bank Details"}</span>
+              <span>Continue to Bank Details</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Step 1 for Settings: Verify Current PIN */}
-            {step === "verify_current" && (
-              <div className="space-y-4 text-center">
-                <div className="p-3 bg-white border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212]">
-                  🔒 Security Check: Enter your <strong>Current 4-Digit PIN</strong>
-                </div>
-                <div className="flex justify-center gap-3">
-                  {currentPin.map((digit, idx) => (
-                    <input
-                      key={idx}
-                      ref={currentRefs[idx]}
-                      type="password"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleCurrentDigit(idx, e.target.value)}
-                      className="w-12 h-14 text-center text-xl font-bold bg-white border border-[#EAEAEA] rounded-[12px] focus:border-[#FF4D1A] focus:outline-none shadow-sm"
-                    />
-                  ))}
-                </div>
-                <p className="text-[11px] text-[#8A8A8A]">
-                  Forgot PIN? <button type="button" onClick={() => router.push("/support")} className="text-[#FF4D1A] font-bold underline">Contact 24/7 Support</button>
-                </p>
-              </div>
-            )}
-
             {step === "enter" && (
               <div className="space-y-3 text-center">
-                <label className="text-xs font-bold text-[#121212]">
-                  {isSettingsMode ? "Enter New 4-Digit PIN" : "Enter 4-Digit Secret PIN"}
-                </label>
+                <label className="text-xs font-bold text-[#121212]">Enter 4-Digit Secret PIN</label>
                 <div className="flex justify-center gap-3">
                   {pin.map((digit, idx) => (
                     <input
@@ -278,13 +206,5 @@ function OnboardingPINContent() {
         )}
       </div>
     </main>
-  );
-}
-
-export default function OnboardingPINPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-xs text-[#8A8A8A]">Loading PIN Setup...</div>}>
-      <OnboardingPINContent />
-    </Suspense>
   );
 }
