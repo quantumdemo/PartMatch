@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MessageSquare, Send, CheckCircle2, User } from "lucide-react";
+import { MessageSquare, Send } from "lucide-react";
 import { SupportService, SupportTicket, SupportChatMessage } from "@/lib/services/supportService";
 
 export default function AdminSupportPage() {
@@ -25,22 +25,15 @@ export default function AdminSupportPage() {
     }
   }, [selectedTicket]);
 
-  const handleSendReply = (e: React.FormEvent) => {
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reply.trim() || !selectedTicket) return;
 
-    const newMsg: SupportChatMessage = {
-      id: `msg-${Date.now()}`,
-      ticket_id: selectedTicket.id,
-      sender_id: "admin-001",
-      sender_role: "admin",
-      message: reply,
-      read: true,
-      created_at: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, newMsg]);
+    const currentReply = reply;
     setReply("");
+
+    const newMsg = await SupportService.sendMessage(selectedTicket.id, "admin-001", "admin", currentReply);
+    setMessages((prev) => [...prev, newMsg]);
   };
 
   return (

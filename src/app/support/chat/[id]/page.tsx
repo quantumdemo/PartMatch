@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { SupportService, SupportChatMessage } from "@/lib/services/supportService";
 import { formatWAT } from "@/lib/timezone";
 
@@ -20,22 +20,15 @@ export default function SupportChatThreadPage() {
     }
   }, [ticketId]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMsg.trim()) return;
 
-    const newMsg: SupportChatMessage = {
-      id: `msg-${Date.now()}`,
-      ticket_id: ticketId,
-      sender_id: "user-123",
-      sender_role: "user",
-      message: inputMsg,
-      read: false,
-      created_at: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, newMsg]);
+    const currentMsg = inputMsg;
     setInputMsg("");
+
+    const newMsg = await SupportService.sendMessage(ticketId, "user-123", "user", currentMsg);
+    setMessages((prev) => [...prev, newMsg]);
   };
 
   return (

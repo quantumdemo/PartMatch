@@ -77,6 +77,8 @@
   - `/admin/inventory-review` Admin PIN-protected inventory approval console
 - [x] Wallet Filtering Enhancement (`/wallet`, `/seller/wallet`, `/mechanic/wallet`)
   - ALL, ESCROW, CREDIT, DEBIT category filter tabs
+- [x] Playwright Snapshot Capture (`/scripts/snapshots.mjs`)
+  - Automated PNG screenshots generated in `/snapshots/mobile/` (440x956) and `/snapshots/admin/` (1440x900)
 - [x] Documentation & Standards
   - `COMMENTING_GUIDE.md` created
   - `.env.example` updated with API key acquisition guide comments
