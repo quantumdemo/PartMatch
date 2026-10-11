@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { Lock, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Lock, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { PinService } from "@/lib/services/pinService";
 import { createClient } from "@/lib/supabase/client";
 
-export default function OnboardingPINPage() {
+function OnboardingPINContent() {
+  const searchParams = useSearchParams();
+  const fromSource = searchParams?.get("from") || "";
+  const isSettingsMode = fromSource === "settings" || fromSource === "dashboard" || fromSource === "wallet";
+
   const [userId, setUserId] = useState<string>("dev-user-id");
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState<string[]>(["", "", "", ""]);
@@ -94,22 +98,35 @@ export default function OnboardingPINPage() {
   return (
     <main className="min-h-screen bg-[#FFFBF5] text-[#121212] font-sans p-4 flex flex-col justify-between max-w-[440px] mx-auto">
       <div className="space-y-6 pt-4 pb-24">
-        {/* Progress Header */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+        {/* Progress Header - Only show if in onboarding flow */}
+        {!isSettingsMode ? (
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#FF4D1A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+            </div>
+            <p className="text-xs font-medium text-[#8A8A8A]">Step 6/7: Transaction PIN</p>
           </div>
-          <p className="text-xs font-medium text-[#8A8A8A]">Step 6/7: Transaction PIN</p>
-        </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-xs text-[#8A8A8A] hover:text-[#121212] transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Settings</span>
+          </button>
+        )}
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">Set Transaction PIN</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-[#121212]">
+            {isSettingsMode ? "Change Transaction PIN" : "Set Transaction PIN"}
+          </h1>
           <p className="text-xs text-[#8A8A8A]">
             Set a secret 4-digit PIN for authorizing escrow payouts and withdrawals.
           </p>
@@ -131,10 +148,10 @@ export default function OnboardingPINPage() {
             </p>
             <button
               type="button"
-              onClick={() => router.push("/onboarding/bank")}
+              onClick={() => router.push(isSettingsMode ? "/me" : "/onboarding/bank")}
               className="w-full h-12 bg-[#FF4D1A] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-2 shadow-sm"
             >
-              <span>Continue to Bank Details</span>
+              <span>{isSettingsMode ? "Return to Profile" : "Continue to Bank Details"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -206,5 +223,13 @@ export default function OnboardingPINPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function OnboardingPINPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-xs text-[#8A8A8A]">Loading PIN Setup...</div>}>
+      <OnboardingPINContent />
+    </Suspense>
   );
 }
