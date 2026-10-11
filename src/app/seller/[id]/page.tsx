@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ShieldCheck, MapPin, Star, Award, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MapPin, Star, Award, CheckCircle2, Store } from "lucide-react";
 import { MarketplaceService, SellerProfileInfo, PartProduct } from "@/lib/services/marketplaceService";
 
 export default function SellerProfilePage() {
@@ -29,19 +29,29 @@ export default function SellerProfilePage() {
 
   if (loading) {
     return (
-      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-10 text-center font-sans">
-        <p className="text-xs text-[#8A8A8A]">Loading seller profile & store inventory...</p>
+      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-10 font-sans space-y-4">
+        <div className="h-8 bg-neutral-200 rounded-xl animate-pulse w-1/2" />
+        <div className="h-36 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
+        <div className="h-28 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
       </main>
     );
   }
 
   if (!seller) {
     return (
-      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-10 text-center font-sans">
-        <p className="text-xs text-red-600 font-bold">Seller profile not found.</p>
+      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-12 text-center font-sans space-y-4">
+        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-[#121212]">
+          <Store className="w-8 h-8 text-[#8A8A8A]" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-base font-bold text-[#121212]">Store Profile Not Found</h2>
+          <p className="text-xs text-[#8A8A8A]">
+            No verified merchant found in the database with this ID.
+          </p>
+        </div>
         <button
           onClick={() => router.back()}
-          className="mt-4 px-4 py-2 bg-[#121212] text-white text-xs font-bold rounded-[12px]"
+          className="px-4 py-2.5 bg-[#121212] text-white text-xs font-bold rounded-[12px]"
         >
           Go Back
         </button>
@@ -128,8 +138,10 @@ export default function SellerProfilePage() {
         </div>
 
         {parts.length === 0 ? (
-          <div className="p-8 text-center bg-white border border-[#EAEAEA] rounded-[16px] text-xs text-[#8A8A8A]">
-            No parts listed in store currently.
+          <div className="p-8 text-center bg-white border border-[#EAEAEA] rounded-[16px] text-xs text-[#8A8A8A] space-y-2">
+            <Store className="w-8 h-8 text-[#8A8A8A] mx-auto" />
+            <p className="font-bold text-[#121212]">No Parts Listed in Store</p>
+            <p className="text-[11px]">This merchant currently has no active part listings in the database.</p>
           </div>
         ) : (
           <div className="space-y-3">
