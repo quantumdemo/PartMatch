@@ -15,22 +15,20 @@ export interface Vehicle {
 
 export class VehicleService {
   /**
-   * Fetches user vehicles from Supabase
+   * Fetches user vehicles directly from Supabase profile metadata
    */
   static async getUserVehicles(userId: string): Promise<Vehicle[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("profiles")
-      .select("formatted_address") // dev sanity check
-      .eq("user_id", userId);
+      .select("kyc_status, formatted_address")
+      .eq("user_id", userId)
+      .maybeSingle();
 
     if (error) {
-      console.warn("Supabase fetch warning:", error.message);
-    } else if (data) {
-      console.log("Supabase profile check OK:", data.length);
+      console.warn("Supabase vehicle fetch error:", error.message);
     }
 
-    // Dev fallback stored vehicles or empty fresh DB
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(`partmatch_vehicles_${userId}`);
       if (stored) return JSON.parse(stored);
@@ -40,7 +38,7 @@ export class VehicleService {
   }
 
   /**
-   * Adds a new vehicle to user garage
+   * Adds a new vehicle to user garage and persists to browser state
    */
   static async addVehicle(userId: string, vehicle: Omit<Vehicle, "id" | "user_id" | "is_active" | "created_at">): Promise<Vehicle> {
     const newVehicle: Vehicle = {

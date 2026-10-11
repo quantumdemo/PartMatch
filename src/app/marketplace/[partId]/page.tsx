@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -12,6 +12,7 @@ import {
   Truck,
   AlertCircle,
   RefreshCw,
+  PackageOpen,
 } from "lucide-react";
 import { MarketplaceService, PartProduct, SellerOffer } from "@/lib/services/marketplaceService";
 import { formatWAT } from "@/lib/timezone";
@@ -28,7 +29,7 @@ export default function PartDetailPage() {
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const fetchPartDetails = async () => {
+  const fetchPartDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -44,21 +45,20 @@ export default function PartDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [partId]);
 
   useEffect(() => {
     if (partId) {
       fetchPartDetails();
     }
-  }, [partId]);
+  }, [partId, fetchPartDetails]);
 
   // Skeleton Loading State
   if (loading) {
     return (
       <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-10 font-sans space-y-4">
         <div className="h-8 bg-neutral-200 rounded-xl animate-pulse w-1/2" />
-        <div className="h-48 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
-        <div className="h-28 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
+        <div className="h-44 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
         <div className="h-32 bg-neutral-200 rounded-[16px] animate-pulse w-full" />
       </main>
     );
@@ -80,15 +80,24 @@ export default function PartDetailPage() {
     );
   }
 
+  // Empty State UI from Prompt (Illustration + CTA)
   if (!part) {
     return (
-      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen py-10 text-center font-sans">
-        <p className="text-xs text-red-600 font-bold">Auto part not found.</p>
+      <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-12 pb-20 text-center font-sans space-y-4">
+        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-[#121212]">
+          <PackageOpen className="w-8 h-8 text-[#8A8A8A]" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-base font-bold text-[#121212]">Part Listing Not Found</h2>
+          <p className="text-xs text-[#8A8A8A]">
+            This spare part has been purchased or is unavailable in the database.
+          </p>
+        </div>
         <button
-          onClick={() => router.back()}
-          className="mt-4 px-4 py-2 bg-[#121212] text-white text-xs font-bold rounded-[12px]"
+          onClick={() => router.push("/diagnose/search")}
+          className="px-5 py-3 bg-[#FF4D1A] text-white text-xs font-bold rounded-[12px] shadow-sm active:scale-[0.98] transition-transform"
         >
-          Go Back
+          Search Marketplace
         </button>
       </main>
     );
@@ -178,7 +187,7 @@ export default function PartDetailPage() {
         </div>
 
         {offers.length === 0 ? (
-          <div className="p-4 text-center text-xs text-[#8A8A8A]">No comparative offers available.</div>
+          <div className="p-4 text-center text-xs text-[#8A8A8A]">No comparative offers in database for this part number.</div>
         ) : (
           <div className="space-y-3">
             {offers.map((offer) => (
