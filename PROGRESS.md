@@ -15,3 +15,11 @@
 - [x] **STEP 6/8**: Payment PIN System (Setup, Change, Reset via OTP+NIN, 3-Fail Lockout, 4-Box Modal)
 - [x] **STEP 7/8**: Bank Account Verification & Paystack Recipient Integration
 - [x] **STEP 8/8**: Unit Tests, Build Verification & Pre-Commit Steps
+
+**STEP WRAP - Pages created using existing components - Onboarding YES**
+- `/onboarding/page.tsx` (R-01..04 Role Select)
+- `/onboarding/auth/page.tsx` (Google/Apple + Resend Email OTP 60s + Password)
+- `/onboarding/live-verify/page.tsx` (Live Face Blink Detection Camera)
+- `/onboarding/kyc/page.tsx` (Role KYC Forms + Mapbox Pin + Profile Lock)
+- `/onboarding/pin/page.tsx` (Set 4-Digit Payment PIN Enter + Confirm)
+- `/(auth)/login/page.tsx` (Login page)
