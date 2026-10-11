@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PlusCircle, ArrowUpRight, History, ArrowLeft, Lock } from "lucide-react";
+import { PlusCircle, ArrowUpRight, History, ArrowLeft, Lock, X } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { createClient } from "@/lib/supabase/client";
 
@@ -24,6 +24,10 @@ export default function CustomerWalletPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
+
+  // Fund Wallet Modal State
+  const [showFundModal, setShowFundModal] = useState(false);
+  const [fundAmountInput, setFundAmountInput] = useState("10000");
 
   useEffect(() => {
     async function loadWalletData() {
@@ -76,6 +80,12 @@ export default function CustomerWalletPage() {
     loadWalletData();
   }, [filter]);
 
+  const handleProceedFund = () => {
+    const numAmount = Number(fundAmountInput) || 10000;
+    setShowFundModal(false);
+    router.push(`/checkout/pay?amount=${numAmount}&title=${encodeURIComponent("Wallet Top-Up Deposit")}`);
+  };
+
   return (
     <main className="max-w-[440px] mx-auto px-4 bg-[#FFFBF5] min-h-screen pt-4 pb-28 font-sans space-y-4">
       {/* Header */}
@@ -123,7 +133,7 @@ export default function CustomerWalletPage() {
 
             <div className="pt-2 flex gap-2">
               <button
-                onClick={() => router.push("/checkout/pay")}
+                onClick={() => setShowFundModal(true)}
                 className="flex-1 h-12 bg-[#FF4D1A] hover:bg-[#E03E0F] text-white text-xs font-bold rounded-[12px] flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.97] transition-transform"
               >
                 <PlusCircle className="w-4 h-4" />
@@ -195,6 +205,65 @@ export default function CustomerWalletPage() {
             )}
           </div>
         </>
+      )}
+
+      {/* Fund Wallet Modal */}
+      {showFundModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white border border-[#EAEAEA] rounded-[24px] p-6 max-w-[400px] w-full space-y-5 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+            <div className="flex justify-between items-center border-b border-[#EAEAEA] pb-3">
+              <h3 className="text-base font-bold text-[#121212]">Fund Wallet</h3>
+              <button
+                onClick={() => setShowFundModal(false)}
+                className="p-1 rounded-full text-[#8A8A8A] hover:bg-neutral-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#121212]">Enter Amount to Deposit (₦ NGN)</label>
+              <input
+                type="number"
+                min={1000}
+                max={5000000}
+                value={fundAmountInput}
+                onChange={(e) => setFundAmountInput(e.target.value)}
+                placeholder="e.g. 25000"
+                className="w-full h-12 px-4 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-lg font-extrabold text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
+              />
+            </div>
+
+            {/* Quick Presets */}
+            <div className="space-y-1.5">
+              <p className="text-[10px] uppercase font-bold text-[#8A8A8A]">Quick Presets</p>
+              <div className="grid grid-cols-4 gap-2 text-xs font-bold">
+                {["5000", "10000", "25000", "50000"].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setFundAmountInput(preset)}
+                    className={`py-2 rounded-[8px] border transition-colors ${
+                      fundAmountInput === preset
+                        ? "bg-[#FF4D1A] text-white border-[#FF4D1A]"
+                        : "bg-[#FFFBF5] text-[#121212] border-[#EAEAEA]"
+                    }`}
+                  >
+                    ₦{(Number(preset) / 1000).toFixed(0)}k
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleProceedFund}
+              disabled={!fundAmountInput || Number(fundAmountInput) < 1000}
+              className="w-full h-14 bg-[#FF4D1A] hover:bg-[#E03E0F] disabled:bg-[#EAEAEA] text-white text-xs font-bold rounded-[12px] shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+            >
+              <span>Proceed to Paystack Deposit</span>
+            </button>
+          </div>
+        </div>
       )}
 
       <BottomNav />
