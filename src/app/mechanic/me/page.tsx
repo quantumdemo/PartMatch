@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { MechanicService, MechanicProfile } from "@/lib/services/mechanicService";
 import { InfoTooltip } from "@/components/InfoTooltip";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function MechanicProfilePage() {
   const router = useRouter();
@@ -93,6 +94,15 @@ export default function MechanicProfilePage() {
           <Power className="w-4 h-4" />
           <span>{profile.is_online ? "ON" : "OFF"}</span>
         </button>
+      </div>
+
+      {/* Theme Settings Card */}
+      <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-2 shadow-sm">
+        <p className="text-xs font-bold text-[#121212]">Preferences</p>
+        <div className="space-y-1">
+          <label className="text-[11px] font-semibold text-[#8A8A8A]">App Display Theme</label>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Locked Trade Cert & Workshop Registration Card */}

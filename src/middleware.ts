@@ -92,6 +92,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (
+    pathname === "/" ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/static") ||

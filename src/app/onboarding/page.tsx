@@ -41,11 +41,15 @@ export default function RoleSelectPage() {
 
   const handleContinue = () => {
     if (!selectedRole) return;
+    const selectedObj = ROLES.find((r) => r.id === selectedRole);
+    const roleCode = selectedObj ? selectedObj.code : "R-01";
+
     if (typeof window !== "undefined") {
+      localStorage.setItem("role_pending", selectedRole);
       localStorage.setItem("partmatch_selected_role", selectedRole);
       document.cookie = `partmatch_user_role=${selectedRole}; path=/; max-age=86400; SameSite=Lax`;
     }
-    router.push("/onboarding/auth");
+    router.push(`/onboarding/auth?role=${roleCode}`);
   };
 
   return (
