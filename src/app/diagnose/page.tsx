@@ -271,19 +271,30 @@ function DiagnoseMethodContent() {
         </div>
       </div>
 
-      {/* Symptom text description */}
-      <div className="bg-white border border-[#EAEAEA] rounded-[16px] p-4 space-y-1.5 shadow-sm">
-        <label className="text-xs font-bold text-[#121212]">Describe Problem or Symptom Details</label>
+      {/* Symptom text description - Disabled unless Describe Vehicle Problem option is selected */}
+      <div className={`bg-white border rounded-[16px] p-4 space-y-1.5 shadow-sm transition-opacity ${
+        selectedMethod === "text" ? "border-[#FF4D1A] opacity-100" : "border-[#EAEAEA] opacity-60"
+      }`}>
+        <label className="text-xs font-bold text-[#121212] flex items-center justify-between">
+          <span>Describe Problem or Symptom Details</span>
+          {selectedMethod !== "text" && (
+            <span className="text-[10px] font-normal text-[#8A8A8A] bg-[#FFFBF5] px-2 py-0.5 rounded-full border border-[#EAEAEA]">
+              Select &apos;Describe Vehicle Problem&apos; above to edit
+            </span>
+          )}
+        </label>
         <textarea
           ref={textInputRef}
           rows={3}
+          disabled={selectedMethod !== "text"}
           value={descriptionText}
-          onChange={(e) => {
-            setDescriptionText(e.target.value);
-            if (e.target.value) setSelectedMethod("text");
-          }}
-          placeholder="e.g. Squealing noise when applying brake, or metallic knocking sound under load..."
-          className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A]"
+          onChange={(e) => setDescriptionText(e.target.value)}
+          placeholder={
+            selectedMethod === "text"
+              ? "e.g. Squealing noise when applying brake, or metallic knocking sound under load..."
+              : "Select 'Describe Vehicle Problem' above to enable symptom text input"
+          }
+          className="w-full p-3 bg-[#FFFBF5] border border-[#EAEAEA] rounded-[12px] text-xs text-[#121212] focus:outline-none focus:border-[#FF4D1A] disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-[#8A8A8A]"
         />
         {capturedFileName && (
           <p className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1 pt-1">

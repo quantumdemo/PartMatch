@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, Image as ImageIcon, CheckCheck, Clock } from "lucide-react";
+import { ArrowLeft, Send, Image as ImageIcon, CheckCheck, Clock, Sparkles, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface ChatMessage {
@@ -13,6 +13,13 @@ interface ChatMessage {
   created_at: string;
   read?: boolean;
 }
+
+const SMART_PILLS = [
+  { label: "📦 Track Order", query: "Where is my order current location and estimated delivery?" },
+  { label: "🛡️ Escrow Payout", query: "How does 72-hour escrow release money to sellers?" },
+  { label: "🛠️ Book Mechanic", query: "Can a mobile mechanic install my spare part at home?" },
+  { label: "💳 Deposit Issue", query: "My Paystack deposit is pending, how to verify transaction?" },
+];
 
 export default function RealtimeChatPage() {
   const params = useParams();
@@ -62,9 +69,8 @@ export default function RealtimeChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim() && !uploadFile) return;
+  const sendDirectMessage = async (textToSend: string) => {
+    if (!textToSend.trim() && !uploadFile) return;
 
     const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id || "dev-user";
@@ -80,7 +86,7 @@ export default function RealtimeChatPage() {
       ticket_id: ticketId,
       sender_id: userId,
       sender_role: "user" as const,
-      message_text: inputText.trim(),
+      message_text: textToSend.trim(),
       image_url: imageUrl,
       created_at: new Date().toISOString(),
       read: true,
@@ -91,19 +97,38 @@ export default function RealtimeChatPage() {
 
     await supabase.from("support_messages").insert(newMsgObj);
 
-    // Simulate typing indicator & automated agent response if first message
+    // Intelligent AI Support Agent Response logic
     setIsTyping(true);
     setTimeout(async () => {
       setIsTyping(false);
+
+      let aiReply = "Thank you for contacting PartMatch Support. A human live agent is assigned to your ticket and will reply shortly.";
+      const lower = textToSend.toLowerCase();
+
+      if (lower.includes("track") || lower.includes("order") || lower.includes("location")) {
+        aiReply = "📦 Your order is tracked via live GPS on Mapbox. Check the 'Orders' tab to view real-time courier movement and driver phone number!";
+      } else if (lower.includes("escrow") || lower.includes("payout") || lower.includes("release")) {
+        aiReply = "🛡️ Escrow Protection holds funds safely in escrow. Once you confirm receipt and testing of your spare part, 85% goes to Seller, 15% to Mechanic!";
+      } else if (lower.includes("mechanic") || lower.includes("install")) {
+        aiReply = "🛠️ Certified Mobile Mechanics are available within your service radius. You can assign a mechanic at checkout or from the 'Mechanics' tab.";
+      } else if (lower.includes("deposit") || lower.includes("paystack") || lower.includes("wallet")) {
+        aiReply = "💳 Paystack deposits are credited automatically to your PartMatch NGN Wallet upon bank confirmation. Go to 'Wallet' to refresh your balance.";
+      }
+
       await supabase.from("support_messages").insert({
         ticket_id: ticketId,
-        sender_id: "agent-id",
+        sender_id: "ai-assistant",
         sender_role: "support",
-        message_text: "Thank you for contacting PartMatch Support. An agent has received your message and is reviewing your ticket.",
+        message_text: aiReply,
         created_at: new Date().toISOString(),
         read: true,
       });
-    }, 2000);
+    }, 1200);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendDirectMessage(inputText);
   };
 
   return (
@@ -171,8 +196,45 @@ export default function RealtimeChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* AI Smart Quick Reply Pills */}
+      <div className="py-2 space-y-1.5 border-t border-[#EAEAEA] bg-[#FFFBF5]">
+        <div className="flex items-center gap-1 text-[10px] font-bold text-[#8A8A8A]">
+          <Sparkles className="w-3 h-3 text-[#FF4D1A]" />
+          <span>AI Quick Assistant Prompts:</span>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {SMART_PILLS.map((pill, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => sendDirectMessage(pill.query)}
+              className="px-2.5 py-1 bg-white hover:bg-[#FF4D1A] hover:text-white text-[11px] font-semibold text-[#121212] border border-[#EAEAEA] rounded-full shrink-0 shadow-sm transition active:scale-[0.97] flex items-center gap-1"
+            >
+              <span>{pill.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Upload Attachment Preview */}
+      {uploadFile && (
+        <div className="p-2 bg-white border border-[#FF4D1A] rounded-[12px] flex items-center justify-between text-xs text-[#121212] shadow-sm mb-1">
+          <div className="flex items-center gap-2 truncate">
+            <ImageIcon className="w-4 h-4 text-[#FF4D1A] shrink-0" />
+            <span className="truncate font-semibold">{uploadFile.name}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setUploadFile(null)}
+            className="p-1 text-[#8A8A8A] hover:text-red-600"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Bottom Message Input Bar */}
-      <form onSubmit={handleSendMessage} className="pt-2 sticky bottom-2 bg-[#FFFBF5]">
+      <form onSubmit={handleSendMessage} className="sticky bottom-2 bg-[#FFFBF5]">
         <div className="flex items-center gap-2 bg-white border border-[#EAEAEA] rounded-[24px] p-2 shadow-md">
           <label className="p-2 text-[#8A8A8A] hover:text-[#FF4D1A] cursor-pointer">
             <ImageIcon className="w-4 h-4" />
@@ -188,7 +250,7 @@ export default function RealtimeChatPage() {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={uploadFile ? `Attached: ${uploadFile.name}` : "Type support message..."}
+            placeholder={uploadFile ? `Ready to send image...` : "Ask AI or support agent..."}
             className="flex-1 bg-transparent text-xs text-[#121212] focus:outline-none px-1"
           />
 
